@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<link rel="shortcut icon" href="images/icon.ico">
+<style type="text/css">
+    /* 1. BASIC PAGE SETUP */
+    body {
+        background-color: #ffffff; /* Clean white background */
+        color: #333333; /* Dark gray text is easier on eyes than pitch black */
+        font-family: "Georgia", "Times New Roman", serif; /* Serif font for the main reading */
+        font-size: 20px; /* Distill uses large, readable text */
+        line-height: 1.6em; /* More breathing room between lines */
+        margin: 0;
+    }
+
+    /* 2. LINKS (Blue) */
+    a:link, a:visited {
+        color: #2e6db2; 
+        text-decoration: none;
+        border-bottom: 1px solid #e0e0e0; /* Subtle underline */
+    }
+    a:hover {
+        color: #1a4e85;
+        border-bottom: 2px solid #1a4e85;
+    }
+
+    /* 3. LAYOUT GRID */
+    .content-margin-container {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        align-items: flex-start; /* Aligns content to top */
+        margin-bottom: 20px;
+    }
+
+    /* 4. MAIN COLUMN (Narrower for readability) */
+    .main-content-block {
+        width: 55%; 
+        max-width: 720px; /* Optimal reading width */
+        background-color: #fff;
+        padding: 0px;
+        /* We REMOVED the borders here */
+        border: none; 
+    }
+
+    /* 5. MARGIN NOTES */
+    .margin-left-block {
+        width: 20%;
+        max-width: 180px;
+        margin-right: 30px;
+        text-align: right;
+        font-size: 14px;
+        color: #6b6b6b;
+        font-family: "HelveticaNeue-Light", "Helvetica Neue", sans-serif; /* Sidenotes stay sans-serif */
+        line-height: 1.4em;
+    }
+
+    .margin-right-block {
+        width: 20%;
+        max-width: 220px; /* Slightly wider right margin */
+        margin-left: 30px;
+        text-align: left;
+        font-size: 13px;
+        color: #6b6b6b;
+        font-family: "HelveticaNeue-Light", "Helvetica Neue", sans-serif;
+        line-height: 1.4em;
+    }
+
+    /* 6. HEADERS */
+    h1, h2, h3 {
+        font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #000;
+        margin-top: 50px;
+        margin-bottom: 15px;
+        font-weight: 600;
+        line-height: 1.2em;
+    }
+    h1 { font-size: 36px; letter-spacing: -0.5px; } /* Big section headers */
+    h2 { font-size: 26px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+    /* 7. IMAGES & CAPTIONS */
+    img, .my-video {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 20px auto;
+        border-radius: 4px; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Subtle shadow for images */
+    }
+
+    /* 8. MATH & CODE */
+    .mathjax-mobile, .mathml-non-mobile { display: none; }
+    .show-mathml .mathml-non-mobile { display: block; }
+    .show-mathjax .mathjax-mobile { display: block; }
+    
+    code {
+        background-color: #f4f4f4;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.9em;
+    }
+
+    /* 9. CITATION BLOCK */
+    div.citation {
+        font-family: "HelveticaNeue-Light", "Helvetica Neue", sans-serif;
+        font-size: 14px;
+        background-color: #f7f7f7;
+        padding: 20px;
+        border-radius: 5px;
+        border: 1px solid #eee;
+    }
+
+    /* 10. TITLE HEADER TABLE SPECIFIC */
+    table.header {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* 11. TOP NAVIGATION BAR */
+    .nav-header {
+        background-color: #23374d; /* Navy Blue */
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 15px 0;
+        font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .nav-inner {
+        width: 90%; 
+        max-width: 1080px; /* Matches the width of the article content */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nav-logo {
+        font-weight: 600;
+        font-size: 18px;
+        color: white !important; /* Force white text */
+        border-bottom: none !important; /* Remove underline */
+        display: flex;
+        align-items: center;
+    }
+
+    .nav-links a {
+        color: rgba(255,255,255,0.7) !important; /* Slightly transparent white */
+        margin-left: 25px;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase; /* MAKES TEXT CAPS */
+        letter-spacing: 0.5px;
+        border-bottom: none !important;
+        transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+        color: #ffffff !important; /* Bright white on hover */
+    }
+
+</style>
+
+<title>Project Title Here</title>
+<meta property="og:title" content="Project Title" />
+<meta charset="UTF-8">
+</head>
+
+<body>
+
+<div class="nav-header">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo">
+            <span class="logo-icon"></span> 6.7960 Project
+        </a>
+        
+        <div class="nav-links">
+            <a href="#">About</a>
+            <a href="#">Paper</a>
+            <a href="#">Code</a>
+            <a href="#">Team</a>
+        </div>
+    </div>
+</div>
+
+<div class="content-margin-container" style="margin-top: 60px; margin-bottom: 60px;">
+    <div class="margin-left-block"></div>
+    <div class="main-content-block">
+        <h1 style="font-size: 50px; line-height: 1.1em; margin-bottom: 20px; font-family: 'Helvetica Neue', Helvetica, sans-serif;">
+            Understanding Deep Learning<br>Through Visualizations
+        </h1>
+        
+        <div style="font-family: 'Helvetica Neue', sans-serif; font-size: 18px; color: #555;">
+            <p>
+                <a href="#">Alice Xiao</a>, 
+                <a href="#">Aimee Yu</a>, 
+                <a href="#">Celinda Zhu</a>
+            </p>
+            <p style="font-size: 15px; color: #888;">
+                Final Project for 6.7960, MIT &bull; Fall 2025
+            </p>
+        </div>
+    </div>
+    <div class="margin-right-block"></div>
+</div>
+
+<div class="content-margin-container" id="intro">
+    <div class="margin-left-block">
+        <div style="position:fixed; max-width:inherit; top:max(20%,120px)">
+            <b style="font-size:16px">Outline</b><br><br>
+            <a href="#intro">Introduction</a><br><br>
+            <a href="#related_work">Literature Review</a><br><br>
+            <a href="#methodology">Methodology</a><br><br>
+            <a href="#experiments">Experiments & Results</a><br><br>
+            <a href="#discussion">Discussion</a><br><br>
+        </div>
+    </div>
+    <div class="main-content-block">
+        <h1>Introduction</h1>
+        <p>
+            Start with a hook. Clearly state the problem and your specific hypothesis. 
+        </p>
+        
+        <img src="./images/your_intro_diagram.png" width=512px/>
+    </div>
+    <div class="margin-right-block">
+        The blog should be technical, precise, and not overly informal[cite: 9].
+    </div>
+</div>
+
+<div class="content-margin-container" id="related_work">
+    <div class="margin-left-block"></div>
+    <div class="main-content-block">
+        <h1>Literature Review</h1>
+        <p>
+            Discuss prior work here. Explain why re-implementing existing methods wasn't enough and how your work seeks new insights[cite: 14].
+        </p>
+    </div>
+    <div class="margin-right-block">
+        Cite papers using the reference links at the bottom.
+    </div>
+</div>
+
+<div class="content-margin-container" id="methodology">
+    <div class="margin-left-block"></div>
+    <div class="main-content-block">
+        <h1>Methodology</h1>
+        <p>
+            Describe your approach. If you have math, use an image or MathML as suggested in the template.
+        </p>
+        
+        <center>
+            <p style="font-family: courier;">Loss = f(x, y) ... (Insert MathML or Image here)</p>
+        </center>
+    </div>
+    <div class="margin-right-block">
+        You can mention implementation details here (e.g., PyTorch, specific architecture).
+    </div>
+</div>
+
+<div class="content-margin-container" id="experiments">
+    <div class="margin-left-block"></div>
+    <div class="main-content-block">
+        <h1>Experiments & Results</h1>
+        <p>
+            Detail your experimental setup. What datasets did you use? What were your baselines?
+        </p>
+        
+        <p>
+            <strong>Results:</strong> Discuss your findings. "Negative" results are acceptable if you analyze the reasons and implications.
+        </p>
+    </div>
+    <div class="margin-right-block">
+        Visualizations are critical. Ensure captions explain the main takeaway of the figure.
+    </div>
+</div>
+
+<div class="content-margin-container" id="discussion">
+    <div class="margin-left-block"></div>
+    <div class="main-content-block">
+        <h1>Discussion & Limitations</h1>
+        <p>
+            What do the results imply? What failed? What would you do differently with more time?
+        </p>
+    </div>
+    <div class="margin-right-block">
+        Word count goal: 2000-3000 words total.
+    </div>
+</div>
+
+<div class="content-margin-container" id="citations">
+    <div class="margin-left-block"></div>
+    <div class="main-content-block">
+        <div class='citation' id="references" style="height:auto"><br>
+            <span style="font-size:16px">References:</span><br><br>
+            <a id="ref_1"></a>[1] <a href="#">Author Name</a>, Paper Title, Year.<br><br>
+            <a id="ref_2"></a>[2] <a href="#">Author Name</a>, Paper Title, Year.<br><br>
+        </div>
+    </div>
+    <div class="margin-right-block"></div>
+</div>
+
+</body>
+</html>
