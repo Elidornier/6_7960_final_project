@@ -92,6 +92,8 @@ class ArgParser():
                                  help='Augmentation box size; Default is 32')
         self.parser.add_argument('--augmentation_mixup_alpha', type=float, default=0.2,
                                  help='Mixup alpha; Default is 0.2')
+        self.parser.add_argument('--max_augmentation_diff', type=int, default=5,
+                                 help='Max Augmentation Difficulty; Default is 5')
 
         # Testing/Inference arguments
         self.parser.add_argument('--test_batch_size', default=16, type=int,
