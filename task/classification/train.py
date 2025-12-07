@@ -156,13 +156,55 @@ def training(args: argparse.Namespace) -> None:
 
                 classification_logits = model(masked_images)
                 batch_loss_cls = cls_loss(classification_logits, labels)
-            elif args.augmentation_type == 'color_cutout_cur':
+            elif args.augmentation_type == 'color_cutout_cur_incr':
                 bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
                 masked_images = images.clone()
 
+                num_stages = args.max_difficulty + 1
+                epochs_per_stage = args.epochs / num_stages
+                current_stage = int(epoch_idx / epochs_per_stage)
+                current_exponent = current_stage
+
+                # Ensure we never exceed max_difficulty (handles the final epoch or float precision edges)
+                current_exponent = min(args.max_difficulty, current_exponent)
+
                 # Generate random color for each image
-                region_size = args.augmentation_box_size // (2 ** epoch_idx) # Decrease the region size as epoch increases
+                region_size = args.augmentation_box_size // (2 ** current_exponent) # Decrease the region size as epoch increases
+                region_size = max(1, region_size)
                 region_amount = args.augmentation_box_size // region_size # We have region_amount ** 2 regions
+
+                for i in range(region_amount ** 2): # We have to generate random color for each region
+                    rx1 = bx1 + region_size * (i // region_amount) # Region x1
+                    rx2 = bx1 + region_size * (i // region_amount + 1) # Region x2
+                    ry1 = by1 + region_size * (i % region_amount) # Region y1
+                    ry2 = by1 + region_size * (i % region_amount + 1) # Region y2
+
+                    mask_color = torch.rand(images.shape[0], images.shape[1], 1, 1).to(device)
+                    masked_images[:, :, rx1:rx2, ry1:ry2] = mask_color # Mask out the cutout region with random color
+
+                classification_logits = model(masked_images)
+                batch_loss_cls = cls_loss(classification_logits, labels)
+            elif args.augmentation_type == 'color_cutout_cur_decr':
+                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
+                masked_images = images.clone()
+
+                num_stages = args.max_difficulty + 1
+                epochs_per_stage = args.epochs / num_stages
+
+                # Determine which stage we are currently in (0-indexed)
+                current_stage = int(epoch_idx / epochs_per_stage)
+
+                # Calculate the exponent for Hard-to-Easy (Start High, End Low)
+                current_exponent = args.max_difficulty - current_stage
+
+                # Safety clamp: Ensure we don't go below 0 (Easy)
+                # This handles the very last epoch or potential float rounding edges
+                current_exponent = max(0, current_exponent)
+
+                region_size = args.augmentation_box_size // (2 ** current_exponent)
+                region_size = max(1, region_size) # Prevent div by 0
+
+                region_amount = args.augmentation_box_size // region_size
 
                 for i in range(region_amount ** 2): # We have to generate random color for each region
                     rx1 = bx1 + region_size * (i // region_amount) # Region x1
