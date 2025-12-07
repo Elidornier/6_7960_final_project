@@ -156,7 +156,7 @@ def training(args: argparse.Namespace) -> None:
                     args.augmentation_max_box_size
                 )
                 bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, cutout_size)
-                
+
                 masked_images = images.clone()
                 masked_images[:, :, bx1:bx2, by1:by2] = 0 # Mask out the cutout region
 
@@ -209,7 +209,7 @@ def training(args: argparse.Namespace) -> None:
                 current_stage = int(epoch_idx / epochs_per_stage)
 
                 # Calculate the exponent for Hard-to-Easy (Start High, End Low)
-                current_exponent = args.max_augmentation_diff - current_stage
+                current_exponent = args.max_augmentation_diff - current_stage - 1
 
                 # Safety clamp: Ensure we don't go below 0 (Easy)
                 # This handles the very last epoch or potential float rounding edges
