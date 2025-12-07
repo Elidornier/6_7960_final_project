@@ -90,6 +90,13 @@ class ArgParser():
                                  help='Whether to use augmented data; Default is none')
         self.parser.add_argument('--augmentation_box_size', type=int, default=32,
                                  help='Augmentation box size; Default is 32')
+        
+        # CHANGE CUTOUT SIZE here, comment out section below to use fixed cutout size
+        self.parser.add_argument('--augmentation_min_box_size', type=int, default=8,
+                                 help='Minimum cutout box size; Default is 8')
+        self.parser.add_argument('--augmentation_max_box_size', type=int, default=32,
+                                 help='Maximum cutout box size; Default is 32')
+        
         self.parser.add_argument('--augmentation_mixup_alpha', type=float, default=0.2,
                                  help='Mixup alpha; Default is 0.2')
         self.parser.add_argument('--max_augmentation_diff', type=int, default=5,

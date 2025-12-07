@@ -22,6 +22,11 @@ from model.optimizer.optimizer import get_optimizer
 from model.optimizer.scheduler import get_scheduler
 from utils.utils import TqdmLoggingHandler, write_log, get_tb_exp_name, get_wandb_exp_name, get_torch_device, check_path, get_cutout_box
 
+# OPTIONAL: Dynamic Cutout Size Function
+def get_dynamic_cutout_size(epoch, num_epochs, min_size, max_size):
+    # Linearly increase cutout size from min_size to max_size
+    return int(min_size + (max_size - min_size) * (epoch / max(num_epochs - 1, 1)))
+
 def training(args: argparse.Namespace) -> None:
     device = get_torch_device(args.device)
 
@@ -142,7 +147,16 @@ def training(args: argparse.Namespace) -> None:
                 classification_logits = model(images)
                 batch_loss_cls = cls_loss(classification_logits, labels)
             elif args.augmentation_type == 'cutout':
-                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
+                # bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
+                # uncomment above and comment below to use fixed cutout size
+                cutout_size = get_dynamic_cutout_size(
+                    epoch_idx,
+                    args.num_epochs,
+                    args.augmentation_min_box_size,
+                    args.augmentation_max_box_size
+                )
+                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, cutout_size)
+                
                 masked_images = images.clone()
                 masked_images[:, :, bx1:bx2, by1:by2] = 0 # Mask out the cutout region
 
