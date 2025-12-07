@@ -231,14 +231,42 @@
 </div>
 
 <div class="content-margin-container" id="related_work">
-    <div class="margin-left-block"></div>
+    <div class="margin-left-block">
+    </div>
     <div class="main-content-block">
         <h1>Literature Review</h1>
         <p>
-            Discuss prior work here. Explain why re-implementing existing methods wasn't enough and how your work seeks new insights[cite: 14].
+            Deep learning models, particularly over-parameterized architectures like ResNet <a href="#ref_1">[1]</a>, rely heavily on Data Augmentation (DA) to improve generalization and prevent overfitting. While traditional methods such as Cutout, Mixup, and CutMix apply stochastic regularization <a href="#ref_2">[2]</a>, they typically ignore the learning state of the model, applying noise with random magnitudes regardless of sample difficulty.
+        </p>
+
+        <h3>Adaptive Augmentation & Curriculum Learning</h3>
+        <p>
+            Recent research has shifted toward <em>adaptive</em> strategies that integrate Curriculum Learning (CL). The core premise of CL is that models learn more efficiently when samples are ordered from easy to hard <a href="#ref_3">[3]</a>. 
+            For example, <strong>ObjBlur</strong> introduces a curriculum for layout-to-image generation by progressively moving from strong blurring (low-frequency signals) to cleaner images (high-frequency details) <a href="#ref_4">[4]</a>. Similarly, <strong>EntAugment</strong> employs an entropy-based metric to assess model confidence, dynamically scaling augmentation magnitude based on the difficulty of the individual sample <a href="#ref_5">[5]</a>.
+        </p>
+
+        <h3>The Directionality of Difficulty</h3>
+        <p>
+            A critical, yet under-explored question is the <em>trajectory</em> of augmentation difficulty. While standard CL dictates an "Easy-to-Hard" schedule, recent work by Maltser on <strong>Augmentation Curriculum Learning (ACL)</strong> investigates alternative pacing, including "Anti-Curriculum" (Hard-to-Easy) strategies <a href="#ref_6">[6]</a>. Maltser's findings suggest that explicitly scoring and ordering augmentations can outperform random selection, but the optimal direction remains a subject of debate.
+        </p>
+
+        <h3>Methodology: Colorful Cutout</h3>
+        <p>
+            To investigate these hypotheses, we utilize <strong>Colorful Cutout</strong> <a href="#ref_7">[7]</a>, a technique that enhances standard Cutout by filling erased regions with random colors and progressively dividing the erasure box into smaller sub-regions. As the number of sub-regions increases, the complexity of the occlusion rises, naturally forming a difficulty gradient. We utilize the official implementation (<a href="https://github.com/c-juhwan/colorful-cutout-aug/tree/master">GitHub</a>) to test whether increasing this difficulty (Curriculum) outperforms decreasing it (Anti-Curriculum) or maintaining a static baseline.
         </p>
     </div>
     <div class="margin-right-block">
+        <div style="margin-bottom: 20px;">
+            <strong>Key Concept:</strong><br>
+            <em>Curriculum Learning</em> suggests training on "easy" data before "hard" data to improve convergence.
+        </div>
+        <div style="margin-bottom: 20px;">
+            <strong>Our Focus:</strong><br>
+            Does the direction of difficulty (Easy&rarr;Hard vs. Hard&rarr;Easy) matter for Data Augmentation?
+        </div>
+        
+        <hr style="border-top: 1px solid #eee; margin: 20px 0;">
+        
         Cite papers using the reference links at the bottom.
     </div>
 </div>
@@ -295,8 +323,21 @@
     <div class="main-content-block">
         <div class='citation' id="references" style="height:auto"><br>
             <span style="font-size:16px">References:</span><br><br>
-            <a id="ref_1"></a>[1] <a href="#">Author Name</a>, Paper Title, Year.<br><br>
-            <a id="ref_2"></a>[2] <a href="#">Author Name</a>, Paper Title, Year.<br><br>
+
+            <a id="ref_1"></a>[1] He, K., et al. "Deep residual learning for image recognition." CVPR 2016.<br><br>
+            
+            <a id="ref_2"></a>[2] DeVries, T., & Taylor, G. W. "Improved regularization of convolutional neural networks with cutout." arXiv 2017.<br><br>
+            
+            <a id="ref_3"></a>[3] Bengio, Y., et al. "Curriculum learning." ICML 2009.<br><br>
+
+            <a id="ref_4"></a>[4] Frolov, S., et al. "ObjBlur: A Curriculum Learning Approach With Progressive Object-Level Blurring." arXiv 2024.<br><br>
+
+            <a id="ref_5"></a>[5] Yang, S., et al. "EntAugment: Entropy-Driven Adaptive Data Augmentation Framework." arXiv 2024.<br><br>
+
+            <a id="ref_6"></a>[6] Maltser, R. "Augmentation Curriculum Learning." Master's Thesis, Hebrew University of Jerusalem, 2025.<br><br>
+
+            <a id="ref_7"></a>[7] Choi, J., & Kim, Y. "Colorful Cutout: Enhancing Image Data Augmentation with Curriculum Learning." ICLR Tiny Papers 2024.<br><br>
+
         </div>
     </div>
     <div class="margin-right-block"></div>
