@@ -160,7 +160,7 @@ def training(args: argparse.Namespace) -> None:
                 bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
                 masked_images = images.clone()
 
-                num_stages = args.max_augmentation_diff + 1
+                num_stages = args.max_augmentation_diff
                 epochs_per_stage = args.num_epochs / num_stages
                 current_stage = int(epoch_idx / epochs_per_stage)
                 current_exponent = current_stage
@@ -188,7 +188,7 @@ def training(args: argparse.Namespace) -> None:
                 bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
                 masked_images = images.clone()
 
-                num_stages = args.max_augmentation_diff + 1
+                num_stages = args.max_augmentation_diff
                 epochs_per_stage = args.num_epochs / num_stages
 
                 # Determine which stage we are currently in (0-indexed)
