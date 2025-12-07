@@ -160,13 +160,13 @@ def training(args: argparse.Namespace) -> None:
                 bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
                 masked_images = images.clone()
 
-                num_stages = args.max_difficulty + 1
-                epochs_per_stage = args.epochs / num_stages
+                num_stages = args.max_augmentation_diff + 1
+                epochs_per_stage = args.num_epochs / num_stages
                 current_stage = int(epoch_idx / epochs_per_stage)
                 current_exponent = current_stage
 
                 # Ensure we never exceed max_difficulty (handles the final epoch or float precision edges)
-                current_exponent = min(args.max_difficulty, current_exponent)
+                current_exponent = min(args.max_augmentation_diff, current_exponent)
 
                 # Generate random color for each image
                 region_size = args.augmentation_box_size // (2 ** current_exponent) # Decrease the region size as epoch increases
@@ -188,14 +188,14 @@ def training(args: argparse.Namespace) -> None:
                 bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
                 masked_images = images.clone()
 
-                num_stages = args.max_difficulty + 1
-                epochs_per_stage = args.epochs / num_stages
+                num_stages = args.max_augmentation_diff + 1
+                epochs_per_stage = args.num_epochs / num_stages
 
                 # Determine which stage we are currently in (0-indexed)
                 current_stage = int(epoch_idx / epochs_per_stage)
 
                 # Calculate the exponent for Hard-to-Easy (Start High, End Low)
-                current_exponent = args.max_difficulty - current_stage
+                current_exponent = args.max_augmentation_diff - current_stage
 
                 # Safety clamp: Ensure we don't go below 0 (Easy)
                 # This handles the very last epoch or potential float rounding edges
