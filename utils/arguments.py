@@ -85,18 +85,18 @@ class ArgParser():
                                  help='Objective to optimize; Default is accuracy')
 
         # Augmentation arguments
-        augmentation_type_list = ['none', 'cutout', 'color_cutout_cur', 'color_cutout_nocur', 'mixup', 'cutmix']
+        augmentation_type_list = ['none', 'cutout', 'color_cutout_cur_incr','color_cutout_cur_decr', 'color_cutout_nocur', 'mixup', 'cutmix','cutout_dynamic_cur_incr','cutout_dynamic_cur_decr']
         self.parser.add_argument('--augmentation_type', type=str, choices=augmentation_type_list, default='none',
                                  help='Whether to use augmented data; Default is none')
         self.parser.add_argument('--augmentation_box_size', type=int, default=32,
                                  help='Augmentation box size; Default is 32')
-        
+
         # CHANGE CUTOUT SIZE here, comment out section below to use fixed cutout size
         self.parser.add_argument('--augmentation_min_box_size', type=int, default=8,
                                  help='Minimum cutout box size; Default is 8')
         self.parser.add_argument('--augmentation_max_box_size', type=int, default=64,
                                  help='Maximum cutout box size; Default is 64')
-        
+
         self.parser.add_argument('--augmentation_mixup_alpha', type=float, default=0.2,
                                  help='Mixup alpha; Default is 0.2')
         self.parser.add_argument('--max_augmentation_diff', type=int, default=5,
