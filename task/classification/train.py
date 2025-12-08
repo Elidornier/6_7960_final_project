@@ -147,15 +147,7 @@ def training(args: argparse.Namespace) -> None:
                 classification_logits = model(images)
                 batch_loss_cls = cls_loss(classification_logits, labels)
             elif args.augmentation_type == 'cutout':
-                # bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
-                # uncomment above and comment below to use fixed cutout size
-                cutout_size = get_dynamic_cutout_size(
-                    epoch_idx,
-                    args.num_epochs,
-                    args.augmentation_min_box_size,
-                    args.augmentation_max_box_size
-                )
-                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, cutout_size)
+                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
 
                 masked_images = images.clone()
                 masked_images[:, :, bx1:bx2, by1:by2] = 0 # Mask out the cutout region
@@ -171,16 +163,7 @@ def training(args: argparse.Namespace) -> None:
                 classification_logits = model(masked_images)
                 batch_loss_cls = cls_loss(classification_logits, labels)
             elif args.augmentation_type == 'color_cutout_cur_incr':
-                cutout_size = get_dynamic_cutout_size(
-                    epoch_idx,
-                    args.num_epochs,
-                    args.augmentation_min_box_size,
-                    args.augmentation_max_box_size
-                )
-                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, cutout_size)
-                
-                # uncomment below to use fixed cutout size
-                # bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
+                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
                 masked_images = images.clone()
 
                 num_stages = args.max_augmentation_diff
@@ -207,7 +190,11 @@ def training(args: argparse.Namespace) -> None:
 
                 classification_logits = model(masked_images)
                 batch_loss_cls = cls_loss(classification_logits, labels)
-            elif args.augmentation_type == 'color_cutout_cur_decr':
+                
+            
+            # ___DYNAMIC___
+            
+            elif args.augmentation_type == 'cutout_cur_incr_dynamic':
                 cutout_size = get_dynamic_cutout_size(
                     epoch_idx,
                     args.num_epochs,
@@ -218,6 +205,19 @@ def training(args: argparse.Namespace) -> None:
                 
                 # uncomment below to use fixed cutout size
                 # bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
+                masked_images = images.clone()
+                
+                mask_color = torch.rand(images.shape[0], images.shape[1], 1, 1).to(device) # Generate random color for each image
+                masked_images[:, :, bx1:bx2, by1:by2] = mask_color # Mask out the cutout region with random color
+
+                classification_logits = model(masked_images)
+                batch_loss_cls = cls_loss(classification_logits, labels)
+            
+            # ___DYNAMIC END___
+            
+            
+            elif args.augmentation_type == 'color_cutout_cur_decr':
+                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
                 masked_images = images.clone()
 
                 num_stages = args.max_augmentation_diff
@@ -249,6 +249,30 @@ def training(args: argparse.Namespace) -> None:
 
                 classification_logits = model(masked_images)
                 batch_loss_cls = cls_loss(classification_logits, labels)
+                
+            
+            # ___DYNAMIC BEGIN___
+            
+            elif args.augmentation_type == 'cutout_cur_decr_dynamic':
+                cutout_size = get_dynamic_cutout_size(
+                    epoch_idx,
+                    args.num_epochs,
+                    args.augmentation_min_box_size,
+                    args.augmentation_max_box_size
+                )
+                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, cutout_size)
+            
+                masked_images = images.clone()
+                
+                mask_color = torch.rand(images.shape[0], images.shape[1], 1, 1).to(device) # Generate random color for each image
+                masked_images[:, :, bx1:bx2, by1:by2] = mask_color # Mask out the cutout region with random color
+
+                classification_logits = model(masked_images)
+                batch_loss_cls = cls_loss(classification_logits, labels)
+                
+            # ___DYNAMIC END___
+            
+            
             elif args.augmentation_type == 'mixup':
                 # Generate mixup ratio
                 mixup_ratio = torch.distributions.beta.Beta(args.augmentation_mixup_alpha, args.augmentation_mixup_alpha).sample().to(device)
