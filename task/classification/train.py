@@ -146,7 +146,7 @@ def training(args: argparse.Namespace) -> None:
             # Train - Get input data
             images = data_dicts['images'].to(device)
             labels = data_dicts['labels'].to(device)
-
+            print("AUG TYPE =", args.augmentation_type)
             if args.augmentation_type == 'none':
                 classification_logits = model(images)
                 batch_loss_cls = cls_loss(classification_logits, labels)
