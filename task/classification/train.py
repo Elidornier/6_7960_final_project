@@ -23,9 +23,13 @@ from model.optimizer.scheduler import get_scheduler
 from utils.utils import TqdmLoggingHandler, write_log, get_tb_exp_name, get_wandb_exp_name, get_torch_device, check_path, get_cutout_box
 
 # OPTIONAL: Dynamic Cutout Size Function
-def get_dynamic_cutout_size(epoch, num_epochs, min_size, max_size):
+def get_dynamic_cutout_incr(epoch, num_epochs, min_size, max_size):
     # Linearly increase cutout size from min_size to max_size
     return int(min_size + (max_size - min_size) * (epoch / max(num_epochs - 1, 1)))
+
+def get_dynamic_cutout_decr(epoch, num_epochs, min_size, max_size):
+    # Linearly decrease cutout size from max_size to min_size
+    return int(max_size - (max_size - min_size) * (epoch / max(num_epochs - 1, 1)))
 
 def training(args: argparse.Namespace) -> None:
     device = get_torch_device(args.device)
@@ -194,8 +198,8 @@ def training(args: argparse.Namespace) -> None:
 
             # ___DYNAMIC___
 
-            elif args.augmentation_type == 'cutout_cur_dynamic_incr':
-                cutout_size = get_dynamic_cutout_size(
+            elif args.augmentation_type == 'cutout_dynamic_cur_incr':
+                cutout_size = get_dynamic_cutout_incr(
                     epoch_idx,
                     args.num_epochs,
                     args.augmentation_min_box_size,
@@ -253,8 +257,8 @@ def training(args: argparse.Namespace) -> None:
 
             # ___DYNAMIC BEGIN___
 
-            elif args.augmentation_type == 'cutout_cur_dynamic_decr':
-                cutout_size = get_dynamic_cutout_size(
+            elif args.augmentation_type == 'cutout_dynamic_cur_decr':
+                cutout_size = get_dynamic_cutout_decr(
                     epoch_idx,
                     args.num_epochs,
                     args.augmentation_min_box_size,
