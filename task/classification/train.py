@@ -171,7 +171,16 @@ def training(args: argparse.Namespace) -> None:
                 classification_logits = model(masked_images)
                 batch_loss_cls = cls_loss(classification_logits, labels)
             elif args.augmentation_type == 'color_cutout_cur_incr':
-                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
+                cutout_size = get_dynamic_cutout_size(
+                    epoch_idx,
+                    args.num_epochs,
+                    args.augmentation_min_box_size,
+                    args.augmentation_max_box_size
+                )
+                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, cutout_size)
+                
+                # uncomment below to use fixed cutout size
+                # bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
                 masked_images = images.clone()
 
                 num_stages = args.max_augmentation_diff
@@ -199,7 +208,16 @@ def training(args: argparse.Namespace) -> None:
                 classification_logits = model(masked_images)
                 batch_loss_cls = cls_loss(classification_logits, labels)
             elif args.augmentation_type == 'color_cutout_cur_decr':
-                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
+                cutout_size = get_dynamic_cutout_size(
+                    epoch_idx,
+                    args.num_epochs,
+                    args.augmentation_min_box_size,
+                    args.augmentation_max_box_size
+                )
+                bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, cutout_size)
+                
+                # uncomment below to use fixed cutout size
+                # bx1, bx2, by1, by2 = get_cutout_box(args.image_crop_size, args.augmentation_box_size)
                 masked_images = images.clone()
 
                 num_stages = args.max_augmentation_diff
