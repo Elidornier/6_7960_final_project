@@ -116,6 +116,7 @@ def testing(args: argparse.Namespace) -> tuple: # (test_acc_cls, test_f1_cls)
         labels = data_dicts['labels'].to(device)
 
         if getattr(args, "test_color_shift", False):
+            print ("my debug message")
             images = apply_color_shift(images, severity=args.test_color_severity)
 
         if getattr(args, "test_cutout", False) and args.test_cutout_size > 0:
