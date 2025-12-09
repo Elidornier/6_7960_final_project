@@ -60,6 +60,22 @@ def training(args: argparse.Namespace) -> None:
     write_log(logger, f"Train dataset size / iterations: {len(dataset_dict['train'])} / {len(dataloader_dict['train'])}")
     write_log(logger, f"Valid dataset size / iterations: {len(dataset_dict['valid'])} / {len(dataloader_dict['valid'])}")
 
+    if args.data_fraction < 1.0:
+        # Estimate the expected size based on the task
+        # CIFAR-10/100 have 50,000 training images total
+        total_train_images = 50000
+
+        # Account for the validation split you removed (e.g., 0.1)
+        # expected_full_train = total_train_images * (1 - args.train_valid_split)
+        # expected_fraction_size = expected_full_train * args.data_fraction
+
+        # Simple Ratio Check
+        actual_fraction = len(dataset_dict['train']) / (total_train_images * (1 - args.train_valid_split))
+
+        write_log(logger, f"[Sanity Check] Target Fraction: {args.data_fraction:.2f}")
+        write_log(logger, f"[Sanity Check] Actual Fraction: {actual_fraction:.2f}")
+        write_log(logger, f"[Sanity Check] Loaded Samples: {len(dataset_dict['train'])}")
+
     # Get model instance
     write_log(logger, "Building model")
     model = ClassificationModel(args).to(device)
