@@ -73,7 +73,7 @@ def testing(args: argparse.Namespace) -> tuple: # (test_acc_cls, test_f1_cls)
                          f"Dataset: {args.task_dataset}",
                          f"Model: {args.model_type}",
                          f"Aug: {args.augmentation_type}",
-                         f"DataFrac {args.data_fraction}"])
+                         f"DataFrac: {args.data_fraction}"])
 
     # Define loss function
     cls_loss = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing_eps)

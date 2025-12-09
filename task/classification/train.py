@@ -127,7 +127,7 @@ def training(args: argparse.Namespace) -> None:
                              f"Dataset: {args.task_dataset}",
                              f"Model: {args.model_type}",
                              f"Aug: {args.augmentation_type}",
-                             f"DataFra: {args.data_fraction}"])
+                             f"DataFrac: {args.data_fraction}"])
         wandb.watch(models=model, criterion=cls_loss, log='all', log_freq=10)
 
     # Train/Valid - Start training
