@@ -72,7 +72,8 @@ def testing(args: argparse.Namespace) -> tuple: # (test_acc_cls, test_f1_cls)
                    tags=["TEST",
                          f"Dataset: {args.task_dataset}",
                          f"Model: {args.model_type}",
-                         f"Aug: {args.augmentation_type}"])
+                         f"Aug: {args.augmentation_type}",
+                         f"DataFrac {args.data_fraction}"])
 
     # Define loss function
     cls_loss = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing_eps)
@@ -122,6 +123,7 @@ def testing(args: argparse.Namespace) -> tuple: # (test_acc_cls, test_f1_cls)
     if args.use_wandb:
         wandb_df = pd.DataFrame({
             'Dataset': [args.task_dataset],
+            'Data_fraction': [args.data_fraction],
             'Model': [args.model_type],
             'Acc': [test_acc_cls],
             'F1': [test_f1_cls],

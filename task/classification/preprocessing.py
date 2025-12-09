@@ -20,6 +20,12 @@ def load_data(args: argparse.Namespace):
     name = args.task_dataset.lower()
     train_valid_split = args.train_valid_split
 
+    def apply_data_fraction(df, fraction, seed):
+        if fraction < 1.0:
+            # Randomly sample the fraction using the seed for reproducibility
+            return df.sample(frac=fraction, random_state=seed).reset_index(drop=True)
+        return df
+
     train_data = {
         'image': [],
         'label': []
@@ -102,6 +108,14 @@ def load_data(args: argparse.Namespace):
         train_df = train_df.sample(frac=1).reset_index(drop=True)
         valid_df = train_df[:int(len(train_df) * train_valid_split)]
         train_df = train_df[int(len(train_df) * train_valid_split):]
+
+        # What I added for data fraction
+        # This ensures we only shrink the training set, not the validation set
+        if hasattr(args, 'data_fraction') and args.data_fraction < 1.0:
+            seed = args.seed if args.seed is not None else 9297
+            print(f"Subsampling CIFAR-100 Training Data to {args.data_fraction*100}%...")
+            train_df = apply_data_fraction(train_df, args.data_fraction, seed)
+            print(f"New Training Size: {len(train_df)}")
 
         train_data['image'] = train_df['img'].tolist()
         train_data['label'] = train_df['fine_label'].tolist()

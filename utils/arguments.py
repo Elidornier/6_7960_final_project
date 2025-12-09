@@ -65,6 +65,8 @@ class ArgParser():
                                  help='Training epochs; Default is 50')
         self.parser.add_argument('--learning_rate', type=float, default=5e-5,
                                  help='Learning rate of optimizer; Default is 5e-5')
+        self.parser.add_argument('--data_fraction', type=float, default=1.0,
+                                 help='Fraction of data to use for training; Default is 1.0')
         # Training arguments 2
         self.parser.add_argument('--num_workers', type=int, default=2,
                                  help='Num CPU Workers; Default is 2')

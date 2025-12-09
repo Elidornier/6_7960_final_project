@@ -103,7 +103,8 @@ def training(args: argparse.Namespace) -> None:
                        tags=["TRAIN",
                              f"Dataset: {args.task_dataset}",
                              f"Model: {args.model_type}",
-                             f"Aug: {args.augmentation_type}"],
+                             f"Aug: {args.augmentation_type}",
+                             f"DataFrac: {args.data_fraction}"],
                        resume=True,
                        id=checkpoint['wandb_id'])
             wandb.watch(models=model, criterion=cls_loss, log='all', log_freq=10)
@@ -125,7 +126,8 @@ def training(args: argparse.Namespace) -> None:
                        tags=["TRAIN",
                              f"Dataset: {args.task_dataset}",
                              f"Model: {args.model_type}",
-                             f"Aug: {args.augmentation_type}"])
+                             f"Aug: {args.augmentation_type}",
+                             f"DataFra: {args.data_fraction}"])
         wandb.watch(models=model, criterion=cls_loss, log='all', log_freq=10)
 
     # Train/Valid - Start training
