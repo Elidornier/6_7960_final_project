@@ -78,6 +78,7 @@
     }
     h1 { font-size: 36px; letter-spacing: -0.5px; } /* Big section headers */
     h2 { font-size: 26px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    h3 { font-size: 20px; font-weight: 600; margin-top: 30px;}
 
     /* 7. IMAGES & CAPTIONS */
     img, .my-video {
@@ -163,8 +164,8 @@
 
 </style>
 
-<title>Project Title Here</title>
-<meta property="og:title" content="Project Title" />
+<title>Trajectory of Augmentation Difficulty</title>
+<meta property="og:title" content="Trajectory of Augmentation Difficulty" />
 <meta charset="UTF-8">
 </head>
 
@@ -189,7 +190,7 @@
     <div class="margin-left-block"></div>
     <div class="main-content-block">
         <h1 style="font-size: 50px; line-height: 1.1em; margin-bottom: 20px; font-family: 'Helvetica Neue', Helvetica, sans-serif;">
-            Understanding Deep Learning<br>Through Visualizations
+            Investigating the Trajectory<br>of Augmentation Difficulty
         </h1>
         
         <div style="font-family: 'Helvetica Neue', sans-serif; font-size: 18px; color: #555;">
@@ -220,13 +221,39 @@
     <div class="main-content-block">
         <h1>Introduction</h1>
         <p>
-            Start with a hook. Clearly state the problem and your specific hypothesis. 
+            The success of deep learning in computer vision is heavily predicated on the ability of over-parameterized models, such as ResNet <a href="#ref_1">[1]</a>, to generalize beyond their training data. Data Augmentation (DA) has emerged as a cornerstone technique to bridge the generalization gap, artificially expanding the training distribution through stochastic transformations like cropping, flipping, and occlusion.
+        </p>
+        <p>
+            However, standard DA pipelines typically treat the training process as <strong>static</strong>. Augmentations are applied with random magnitudes drawn from a fixed distribution, regardless of the model's current learning state[cite: 2040]. This creates a potential misalignment: in early training stages, strong augmentations might introduce excessive noise that hinders convergence, while in later stages, weak augmentations may fail to provide sufficient regularization to prevent overfitting.
         </p>
         
+        <h3>The Curriculum vs. Anti-Curriculum Hypothesis</h3>
+        <p>
+            <strong>Curriculum Learning (CL)</strong>, as proposed by Bengio et al., suggests that models—like humans—learn more effectively when samples are presented in a meaningful order of increasing difficulty ("Easy&to;Hard") <a href="#ref_3">[3]</a>. Recent adaptive frameworks like EntAugment <a href="#ref_5">[5]</a> and ObjBlur <a href="#ref_4">[4]</a> have successfully applied this principle to DA.
+        </p>
+        <p>
+            Conversely, a counter-intuitive line of research suggests an <strong>"Anti-Curriculum"</strong> (Hard&to;Easy) approach. Work by Maltser <a href="#ref_6">[6]</a> indicates that exposing models to difficult, strongly augmented samples early on might force the learning of more robust, shape-invariant features, effectively preventing the model from relying on superficial textures or "shortcuts" during the initial plasticity phase[cite: 1347].
+        </p>
+
+        <h3>Our Contribution</h3>
+        <p>
+            In this work, we systematically investigate the <strong>directionality of difficulty</strong> in data augmentation. We utilize two distinct augmentation mechanisms—<strong>Colorful Cutout</strong> <a href="#ref_7">[7]</a> and <strong>Dynamic Cutout Sizing</strong>—to compare three training regimes:
+        </p>
+        <ul>
+            <li><strong>Static Baseline:</strong> Random augmentation magnitude.</li>
+            <li><strong>Curriculum (Easy &rarr; Hard):</strong> Gradually increasing complexity/occlusion.</li>
+            <li><strong>Anti-Curriculum (Hard &rarr; Easy):</strong> Gradually decreasing complexity/occlusion.</li>
+        </ul>
+        <p>
+            By training ResNet50 architectures on CIFAR-10 under these varying dynamics, we aim to decouple the impact of augmentation <em>type</em> from augmentation <em>scheduling</em>.
+        </p>
         <img src="./images/your_intro_diagram.png" width=512px/>
     </div>
     <div class="margin-right-block">
-        The blog should be technical, precise, and not overly informal[cite: 9].
+        <div style="margin-bottom: 20px;">
+            <strong>Hypothesis:</strong><br>
+            Does early exposure to "hard" augmentations (Anti-Curriculum) induce better robustness than the traditional "Easy-to-Hard" Curriculum?
+        </div>
     </div>
 </div>
 
@@ -236,7 +263,7 @@
     <div class="main-content-block">
         <h1>Literature Review</h1>
         <p>
-            Deep learning models, particularly over-parameterized architectures like ResNet <a href="#ref_1">[1]</a>, rely heavily on Data Augmentation (DA) to improve generalization and prevent overfitting. While traditional methods such as Cutout, Mixup, and CutMix apply stochastic regularization <a href="#ref_2">[2]</a>, they typically ignore the learning state of the model, applying noise with random magnitudes regardless of sample difficulty.
+            Deep learning models rely heavily on Data Augmentation (DA) to improve generalization. While traditional methods such as Cutout, Mixup, and CutMix apply stochastic regularization <a href="#ref_2">[2]</a>, they typically ignore the learning state of the model, applying noise with random magnitudes regardless of sample difficulty.
         </p>
 
         <h3>Adaptive Augmentation & Curriculum Learning</h3>
@@ -252,7 +279,7 @@
 
         <h3>Methodology: Colorful Cutout</h3>
         <p>
-            To investigate these hypotheses, we utilize <strong>Colorful Cutout</strong> <a href="#ref_7">[7]</a>, a technique that enhances standard Cutout by filling erased regions with random colors and progressively dividing the erasure box into smaller sub-regions. As the number of sub-regions increases, the complexity of the occlusion rises, naturally forming a difficulty gradient. We utilize the official implementation (<a href="https://github.com/c-juhwan/colorful-cutout-aug/tree/master">GitHub</a>) to test whether increasing this difficulty (Curriculum) outperforms decreasing it (Anti-Curriculum) or maintaining a static baseline.
+            To investigate these hypotheses, we utilize <strong>Colorful Cutout</strong> <a href="#ref_7">[7]</a>, a technique that enhances standard Cutout by filling erased regions with random colors and progressively dividing the erasure box into smaller sub-regions. As the number of sub-regions increases, the complexity of the occlusion rises, naturally forming a difficulty gradient[cite: 2065]. We utilize the official implementation (<a href="https://github.com/c-juhwan/colorful-cutout-aug/tree/master">GitHub</a>) to test whether increasing this difficulty (Curriculum) outperforms decreasing it (Anti-Curriculum) or maintaining a static baseline.
         </p>
     </div>
     <div class="margin-right-block">
@@ -276,15 +303,51 @@
     <div class="main-content-block">
         <h1>Methodology</h1>
         <p>
-            Describe your approach. If you have math, use an image or MathML as suggested in the template.
+            Our experimental framework is built on PyTorch, utilizing the <strong>CIFAR-10</strong> dataset <a href="#ref_8">[8]</a> and a <strong>ResNet50</strong> backbone <a href="#ref_1">[1]</a>. To isolate the effects of curriculum pacing, we maintain consistent hyperparameters across all runs (Batch Size=32, Learning Rate=5e-5), modifying only the augmentation pipeline.
+        </p>
+
+        <h3>Defining "Difficulty"</h3>
+        <p>
+            We define difficulty through the lens of information loss and signal complexity. We explore two specific augmentation modalities:
         </p>
         
+        <h4>1. Colorful Cutout (Complexity-based)</h4>
+        <p>
+            Building on the work of Choi & Kim <a href="#ref_7">[7]</a>, this method occludes a portion of the image with a grid of random colors rather than black pixels.
+        </p>
+        <ul>
+            <li><strong>Easy:</strong> Low number of sub-regions ($N$); resembles a solid color block.</li>
+            <li><strong>Hard:</strong> High number of sub-regions ($N$); introduces high-frequency color noise.</li>
+        </ul>
+        
+
+        <h4>2. Dynamic Cutout Size (Occlusion-based)</h4>
+        <p>
+            A standard cutout approach where the <em>size</em> of the occluded region varies dynamically.
+        </p>
+        <ul>
+            <li><strong>Easy:</strong> Small mask (minimal information loss).</li>
+            <li><strong>Hard:</strong> Large mask (significant semantic occlusion).</li>
+        </ul>
+        
+
+        <h3>Pacing Functions</h3>
+        <p>
+            We implemented dynamic schedulers that adjust the augmentation parameters ($N$ for Colorful Cutout, $Size$ for Dynamic Cutout) as a linear function of the training epoch $t$:
+        </p>
         <center>
-            <p style="font-family: courier;">Loss = f(x, y) ... (Insert MathML or Image here)</p>
+            <p style="font-family: courier;">
+                Difficulty(t) &propto; t / T_total &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Curriculum: Easy &rarr; Hard)<br>
+                Difficulty(t) &propto; 1 - (t / T_total) &nbsp; (Anti-Curriculum: Hard &rarr; Easy)
+            </p>
         </center>
+        <p>
+           This allows us to test the trajectory of learning without changing the total amount of augmentation applied over the course of training.
+        </p>
     </div>
     <div class="margin-right-block">
-        You can mention implementation details here (e.g., PyTorch, specific architecture).
+        <strong>Implementation:</strong><br>
+        We utilize a modular argument parser to switch between <code>cutout_dynamic_cur_incr</code> and <code>cutout_dynamic_cur_decr</code>.
     </div>
 </div>
 
@@ -293,11 +356,11 @@
     <div class="main-content-block">
         <h1>Experiments & Results</h1>
         <p>
-            Detail your experimental setup. What datasets did you use? What were your baselines?
+            <em>(Results pending final training runs)</em>
         </p>
         
         <p>
-            <strong>Results:</strong> Discuss your findings. "Negative" results are acceptable if you analyze the reasons and implications.
+            We compare the test accuracy of ResNet50 on CIFAR-10 across three conditions: Static Baseline, Increasing Difficulty, and Decreasing Difficulty.
         </p>
     </div>
     <div class="margin-right-block">
@@ -309,12 +372,25 @@
     <div class="margin-left-block"></div>
     <div class="main-content-block">
         <h1>Discussion & Limitations</h1>
+        
+        <h3>Discussion</h3>
         <p>
-            What do the results imply? What failed? What would you do differently with more time?
+            Our investigation aims to reveal whether the "Easy-to-Hard" intuition holds for data augmentation. If the Curriculum strategy dominates, it suggests that deep networks require a "warm-up" period to learn basic features before handling noise. However, if the Anti-Curriculum strategy proves effective, it would imply that early regularization is crucial for preventing the optimization trajectory from falling into sharp, non-generalizable local minima.
+        </p>
+
+        <h3>Limitations</h3>
+        <p>
+            <strong>Dataset Scale:</strong> Our experiments are limited to CIFAR-10. The dynamics of curriculum learning may differ significantly on higher-resolution datasets like ImageNet, where texture bias is more pronounced.
+        </p>
+        <p>
+            <strong>Training Duration:</strong> Due to computational constraints, our experiments utilized shortened training cycles (5 epochs). While sufficient to observe convergence trends, long-term training dynamics (e.g., late-stage overfitting) might reveal different behaviors in a full production setting.
+        </p>
+        <p>
+            <strong>Augmentation Scope:</strong> We focused exclusively on occlusion-based augmentations (Cutout variants). Geometric augmentations (Rotation, Warping) might respond differently to curriculum pacing.
         </p>
     </div>
     <div class="margin-right-block">
-        Word count goal: 2000-3000 words total.
+        Future work could explore <strong>oscillating schedules</strong> (Cyclical Learning Rates applied to augmentation).
     </div>
 </div>
 
@@ -337,6 +413,8 @@
             <a id="ref_6"></a>[6] Maltser, R. "Augmentation Curriculum Learning." Master's Thesis, Hebrew University of Jerusalem, 2025.<br><br>
 
             <a id="ref_7"></a>[7] Choi, J., & Kim, Y. "Colorful Cutout: Enhancing Image Data Augmentation with Curriculum Learning." ICLR Tiny Papers 2024.<br><br>
+            
+            <a id="ref_8"></a>[8] Krizhevsky, A., et al. "Learning multiple layers of features from tiny images." 2009.<br><br>
 
         </div>
     </div>
