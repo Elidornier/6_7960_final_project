@@ -90,6 +90,12 @@ def load_data(args: argparse.Namespace):
         valid_df = train_df[:int(len(train_df) * train_valid_split)]
         train_df = train_df[int(len(train_df) * train_valid_split):]
 
+        if hasattr(args, 'data_fraction') and args.data_fraction < 1.0:
+            seed = args.seed if args.seed is not None else 9297
+            print(f"Subsampling {name} Training Data to {args.data_fraction*100}%...")
+            train_df = apply_data_fraction(train_df, args.data_fraction, seed)
+            print(f"New Training Size: {len(train_df)}")
+
         train_data['image'] = train_df['img'].tolist()
         train_data['label'] = train_df['label'].tolist()
         valid_data['image'] = valid_df['img'].tolist()
