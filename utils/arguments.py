@@ -120,5 +120,12 @@ class ArgParser():
         self.parser.add_argument('--log_freq', default=500, type=int,
                                  help='Logging frequency; Default is 500')
 
+        # Test-time corruption (for color robustness test)
+        self.parser.add_argument('--test_color_shift', type=parse_bool, default=False,
+                                help='Apply color shift during testing')
+        self.parser.add_argument('--test_color_severity', type=int, default=3,
+                                help='Color shift severity level (1–5)')
+
+
     def get_args(self):
         return self.parser.parse_args()

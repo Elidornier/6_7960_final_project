@@ -19,6 +19,32 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from model.classification.model import ClassificationModel
 from model.classification.dataset import CustomDataset, collate_fn
 from utils.utils import TqdmLoggingHandler, write_log, get_tb_exp_name, get_wandb_exp_name, get_torch_device
+import torchvision.transforms as T
+
+def apply_color_shift(images, severity=1):
+    """
+    images: torch tensor (B, C, H, W)
+    severity: 1–5 (corruption level)
+    """
+
+    # 你可以自由调这个 severity → 你想越狠就越大
+    brightness = 0.2 * severity
+    contrast   = 0.2 * severity
+    saturation = 0.2 * severity
+    hue        = 0.05 * severity
+
+    jitter = T.ColorJitter(
+        brightness=brightness,
+        contrast=contrast,
+        saturation=saturation,
+        hue=hue
+    )
+
+    # torchvision 对 Tensor 也兼容，需要逐张处理
+    out = []
+    for img in images:
+        out.append(jitter(img))
+    return torch.stack(out)
 
 def testing(args: argparse.Namespace) -> tuple: # (test_acc_cls, test_f1_cls)
     device = get_torch_device(args.device)
@@ -88,6 +114,9 @@ def testing(args: argparse.Namespace) -> tuple: # (test_acc_cls, test_f1_cls)
         # Test - Get input data
         images = data_dicts['images'].to(device)
         labels = data_dicts['labels'].to(device)
+
+        if getattr(args, "test_color_shift", False):
+            images = apply_color_shift(images, severity=args.test_color_severity)
 
         # Test - Forward pass
         with torch.no_grad():
