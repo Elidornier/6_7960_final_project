@@ -126,6 +126,13 @@ class ArgParser():
         self.parser.add_argument('--test_color_severity', type=int, default=3,
                                 help='Color shift severity level (1–5)')
 
+        # Robustness test: occlusion
+        self.parser.add_argument('--test_cutout', type=parse_bool, default=False,
+                         help='Apply cutout during testing')
+        self.parser.add_argument('--test_cutout_size', type=int, default=0,
+                                help='Cutout box size during testing')
+
+
 
     def get_args(self):
         return self.parser.parse_args()

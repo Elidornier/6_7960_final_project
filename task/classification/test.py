@@ -18,7 +18,7 @@ from torch.utils.tensorboard import SummaryWriter
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from model.classification.model import ClassificationModel
 from model.classification.dataset import CustomDataset, collate_fn
-from utils.utils import TqdmLoggingHandler, write_log, get_tb_exp_name, get_wandb_exp_name, get_torch_device
+from utils.utils import TqdmLoggingHandler, write_log, get_tb_exp_name, get_wandb_exp_name, get_torch_device, get_cutout_box
 import torchvision.transforms as T
 
 def apply_color_shift(images, severity=1):
@@ -117,6 +117,19 @@ def testing(args: argparse.Namespace) -> tuple: # (test_acc_cls, test_f1_cls)
 
         if getattr(args, "test_color_shift", False):
             images = apply_color_shift(images, severity=args.test_color_severity)
+
+        if getattr(args, "test_cutout", False) and args.test_cutout_size > 0:
+            masked_images = images.clone()
+            B, C, H, W = masked_images.shape
+
+            for i in range(B):
+                bx1, bx2, by1, by2 = get_cutout_box(
+                    image_size=H,
+                    cutout_size=args.test_cutout_size
+                )
+                masked_images[i, :, bx1:bx2, by1:by2] = 0  # black square
+
+            images = masked_images
 
         # Test - Forward pass
         with torch.no_grad():
