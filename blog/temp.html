@@ -40,7 +40,6 @@
         max-width: 720px; /* Optimal reading width */
         background-color: #fff;
         padding: 0px;
-        /* We REMOVED the borders here */
         border: none; 
     }
 
@@ -52,13 +51,13 @@
         text-align: right;
         font-size: 14px;
         color: #6b6b6b;
-        font-family: "HelveticaNeue-Light", "Helvetica Neue", sans-serif; /* Sidenotes stay sans-serif */
+        font-family: "HelveticaNeue-Light", "Helvetica Neue", sans-serif;
         line-height: 1.4em;
     }
 
     .margin-right-block {
         width: 20%;
-        max-width: 220px; /* Slightly wider right margin */
+        max-width: 220px;
         margin-left: 30px;
         text-align: left;
         font-size: 13px;
@@ -76,7 +75,7 @@
         font-weight: 600;
         line-height: 1.2em;
     }
-    h1 { font-size: 36px; letter-spacing: -0.5px; } /* Big section headers */
+    h1 { font-size: 36px; letter-spacing: -0.5px; }
     h2 { font-size: 26px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     h3 { font-size: 20px; font-weight: 600; margin-top: 30px;}
 
@@ -87,7 +86,7 @@
         display: block;
         margin: 20px auto;
         border-radius: 4px; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Subtle shadow for images */
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
     /* 8. MATH & CODE */
@@ -132,7 +131,7 @@
     
     .nav-inner {
         width: 90%; 
-        max-width: 1080px; /* Matches the width of the article content */
+        max-width: 1080px; 
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -141,25 +140,25 @@
     .nav-logo {
         font-weight: 600;
         font-size: 18px;
-        color: white !important; /* Force white text */
-        border-bottom: none !important; /* Remove underline */
+        color: white !important;
+        border-bottom: none !important;
         display: flex;
         align-items: center;
     }
 
     .nav-links a {
-        color: rgba(255,255,255,0.7) !important; /* Slightly transparent white */
+        color: rgba(255,255,255,0.7) !important;
         margin-left: 25px;
         font-size: 12px;
         font-weight: 500;
-        text-transform: uppercase; /* MAKES TEXT CAPS */
+        text-transform: uppercase;
         letter-spacing: 0.5px;
         border-bottom: none !important;
         transition: color 0.2s;
     }
 
     .nav-links a:hover {
-        color: #ffffff !important; /* Bright white on hover */
+        color: #ffffff !important;
     }
 
 </style>
@@ -214,12 +213,12 @@
             <a href="#intro">Introduction</a><br><br>
             <a href="#related_work">Related Work</a><br><br>
             <a href="#methodology">Methodology</a><br><br>
-            <a href="#experiments">Experiments & Results</a><br><br>
+            <a href="#experiments">Results</a><br><br>
             <a href="#discussion">Discussion</a><br><br>
         </div>
     </div>
     <div class="main-content-block">
-        <h1>Introduction</h1>
+        <h1>1. Introduction</h1>
         
         <h3>Motivation</h3>
         <p>
@@ -238,7 +237,7 @@
 
         <h3>Curriculum Learning</h3>
         <p>
-            Curriculum Learning, as proposed by Bengio et al. <a href="#ref_3">[3]</a>, formalizes this intuition. It suggests that models learn more effectively when samples are presented in a meaningful order of increasing difficulty ("Easy-to-Hard"). Recent adaptive frameworks like EntAugment <a href="#ref_5">[5]</a> and ObjBlur <a href="#ref_4">[4]</a> have successfully applied this principle to data augmentation, scaling augmentation intensity as the model matures to match its growing capacity.
+            Curriculum Learning, as proposed by Bengio et al. <a href="#ref_3">[3]</a>, formalizes this intuition. It suggests that models learn more effectively when samples are presented in a meaningful order of increasing difficulty ("Easy-to-Hard"). Recent adaptive frameworks like EntAugment <a href="#ref_5">[5]</a> and ObjBlur <a href="#ref_4">[4]</a> have successfully applied this principle to data augmentation.
         </p>
 
         <h3>Anti-Curriculum</h3>
@@ -248,7 +247,18 @@
 
         <h3>Our Contribution</h3>
         <p>
-            In this work, we systematically investigate the <strong>trajectory of difficulty</strong> in data augmentation. We do not merely ask <em>if</em> curriculum learning helps; we ask <em>which trajectory</em> is optimal. We explore two distinct axes of difficulty:
+            In this work, we systematically investigate the <strong>trajectory of difficulty</strong> in data augmentation. We do not merely ask <em>if</em> curriculum learning helps; we ask <em>which trajectory</em> is optimal. We define our core question: <strong>Should augmentation difficulty increase or decrease over training, and does the direction of this curriculum significantly affect generalization on CIFAR-10/100?</strong>
+        </p>
+        <p>
+            We briefly preview our main findings:
+        </p>
+        <ul>
+            <li><strong>Performance Parity:</strong> Contrary to the intuitive expectation, no curriculum direction consistently outperformed the others in terms of best-case test accuracy. All curricula (increasing, decreasing, static) reach similar best-case accuracy.</li>
+            <li><strong>Stability over Performance:</strong> The dominant effect of strong augmentation curricula in this regime is on training stability (the frequency of failed runs), not on the quality of the final solution.</li>
+            <li><strong>Magnitude of Effect:</strong> Any advantage of "Easy-to-Hard" is small relative to the base hyperparameters and the inherent variance of SGD.</li>
+        </ul>
+        <p>
+            We explore two distinct axes of difficulty:
         </p>
         <ol>
             <li><strong>Complexity-based:</strong> Using <strong>Colorful Cutout</strong> <a href="#ref_7">[7]</a> to vary the information entropy of the occluded region.</li>
@@ -278,7 +288,10 @@
 <div class="content-margin-container" id="related_work">
     <div class="margin-left-block"></div>
     <div class="main-content-block">
-        <h1>Related Work</h1>
+        <h1>2. Related Work</h1>
+        <p>
+            The field of deep learning has long relied on Data Augmentation (DA) to improve generalization. Classic augmentations include geometric transformations (flips, crops) and occlusion methods like Cutout <a href="#ref_2">[2]</a> and Random Erasing. A key discussion in this field concerns the "strength" of augmentation—stronger augmentations provide better regularization but risk destroying label information.
+        </p>
         <p>
             Recent research has pivoted toward <strong>adaptive</strong> strategies that integrate curriculum learning: models learn faster and better when training examples are ordered from easy to hard <a href="#ref_3">[3]</a>.
         </p>
@@ -312,167 +325,364 @@
 <div class="content-margin-container" id="methodology">
     <div class="margin-left-block"></div>
     <div class="main-content-block">
-        <h1>Methodology</h1>
+        <h1>3. Methodology</h1>
+        
+        <h3>3.1 Task, Datasets, and Model</h3>
         <p>
-            Our experimental framework is built on PyTorch, utilizing the <strong>CIFAR-10</strong> dataset <a href="#ref_8">[8]</a> and a <strong>ResNet50</strong> backbone <a href="#ref_1">[1]</a>. To isolate the effects of curriculum pacing, we maintain consistent hyperparameters across all runs (Batch Size=32, Learning Rate=5e-5), modifying only the augmentation pipeline.
+            To isolate the effect of the curriculum, we needed a rigorously controlled environment. We didn't want model capacity or hyperparameter tuning to affect the result, so we kept the training recipe the same across augmentations.
+        </p>
+        <ul style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 10px;"><strong>Task:</strong> Supervised image classification.</li>
+            <li style="margin-bottom: 10px;"><strong>Datasets:</strong> We evaluated performance on CIFAR-10 and CIFAR-100. CIFAR images (32×32) are resized to 256×256 then cropped to 244×244 and normalized for ResNet-50. We tested two distinct data availability regimes:
+                <ul style="margin-top: 5px; margin-bottom: 5px; list-style-type: circle;">
+                    <li><strong>Full Data:</strong> We use the entire training split after the train/validation partition.</li>
+                    <li><strong>Low-Data (10%):</strong> We subsample the training split to retain only a fixed fraction <i>f=0.1</i>.</li>
+                </ul>
+            </li>
+            <li><strong>Model:</strong> ResNet-50.</li>
+        </ul>
+        
+        <p>
+            Given an input image <i style="font-family: serif;">x</i> &in; &#8477;<sup>3 &times; H &times; W</sup>, the backbone produces a feature tensor which we globally pool and flatten into a vector <i style="font-family: serif;">h</i> &in; &#8477;<sup>d</sup>. The final prediction layer is a small MLP classifier. We train the model to minimize cross-entropy loss with label smoothing to mitigate overconfidence.
         </p>
 
-        <h3>Defining "Difficulty"</h3>
+        <h3>Augmentations</h3>
         <p>
-            We define difficulty through the lens of information loss and signal complexity. We explore two specific augmentation modalities:
+            We investigated two types of augmentation. Each has a difficulty level we can change during training.
         </p>
-        
-        <h4>1. Colorful Cutout (Complexity-based)</h4>
-        <p>
-            Building on the work of Choi & Kim <a href="#ref_7">[7]</a>, this method occludes a portion of the image with a grid of random colors rather than black pixels.
-        </p>
-        <p>
-            For a bounding box of size <i style="font-family: serif;">B</i>, we define the sub-region size <i style="font-family: serif;">S</i> as:
-        </p>
-        
-        <center>
-            <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
-              <mi>S</mi>
-              <mo>=</mo>
-              <mfrac>
-                <mi>B</mi>
-                <msup>
-                  <mn>2</mn>
-                  <mtext>exponent</mtext>
-                </msup>
-              </mfrac>
-            </math>
-        </center>
-        
-        <p>
-            where the <code>exponent</code> determines the granularity.
-        </p>
-        <ul>
-            <li><strong>Easy (Low Exponent):</strong> Large <i style="font-family: serif;">S</i>, resulting in a few solid color blocks.</li>
-            <li><strong>Hard (High Exponent):</strong> Small <i style="font-family: serif;">S</i>, resulting in high-frequency color noise.</li>
+
+        <ul style="list-style-type: disc; margin-left: 20px;">
+            
+            <li style="margin-bottom: 25px;">
+                <strong>A. Colorful Cutout (Complexity-based Difficulty)</strong>
+                <div style="margin-top: 5px; margin-bottom: 10px;">
+                    This augmentation is implemented based on the Colorful Cutout; this places a single box of random noise over the image.
+                </div>
+                <ul style="list-style-type: circle; margin-left: 20px;">
+                    <li style="margin-bottom: 8px;">
+                        <strong>Mechanism:</strong> For a bounding box of size <i style="font-family: serif;">B</i>, we define a <code>region_size</code> <i style="font-family: serif;">S</i>. The box is divided into (<i style="font-family: serif;">B/S</i>)<sup>2</sup> sub-squares. Each sub-square is filled with a random color.
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <strong>Difficulty Metric:</strong> As <i style="font-family: serif;">S</i> decreases, the number of sub-regions increases, creating higher-frequency color noise (higher entropy).
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <strong>Code Implementation:</strong>
+                        <div style="margin: 10px 0; text-align: left; padding-left: 20px;">
+                             <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline">
+                              <mi>S</mi>
+                              <mo>=</mo>
+                              <mfrac>
+                                <mi>B</mi>
+                                <msup>
+                                  <mn>2</mn>
+                                  <mtext>exponent</mtext>
+                                </msup>
+                              </mfrac>
+                            </math>
+                        </div>
+                        Where <code>exponent</code> is the curriculum variable controlled by the epoch index.
+                    </li>
+                </ul>
+            </li>
+
+            <li style="margin-bottom: 25px;">
+                <strong>B. Dynamic Cutout Size (Occlusion-based Difficulty)</strong>
+                <div style="margin-top: 5px; margin-bottom: 10px;">
+                    This method varies the spatial extent of the occlusion. We dynamically calculate the side length of the square mask, <i style="font-family: serif;">L<sub>mask</sub></i>, based on the current epoch.
+                </div>
+                <ul style="list-style-type: circle; margin-left: 20px;">
+                    <li style="margin-bottom: 8px;">
+                        <strong>Mechanism:</strong> We linearly interpolate the mask size between a minimum (<i style="font-family: serif;">L<sub>min</sub></i>) and maximum (<i style="font-family: serif;">L<sub>max</sub></i>) value.
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        <strong>Difficulty Metric:</strong> Larger <i style="font-family: serif;">L<sub>mask</sub></i> corresponds to greater information loss (higher difficulty).
+                    </li>
+                    <li style="margin-bottom: 8px;">
+                        We implemented a variant of this augmentation with a larger increase in side length in each step.
+                    </li>
+                </ul>
+            </li>
         </ul>
-        
-        <h4>2. Dynamic Cutout Size (Occlusion-based)</h4>
-        <p>
-            A standard cutout approach where the side length of the occluded region (<i style="font-family: serif;">L<sub>mask</sub></i>) varies dynamically between a minimum (<i style="font-family: serif;">L<sub>min</sub></i>) and maximum (<i style="font-family: serif;">L<sub>max</sub></i>).
-        </p>
-        <ul>
-            <li><strong>Easy:</strong> Small mask (<i style="font-family: serif;">L<sub>min</sub></i>); minimal information loss.</li>
-            <li><strong>Hard:</strong> Large mask (<i style="font-family: serif;">L<sub>max</sub></i>); significant semantic occlusion.</li>
-        </ul>
+
         <h3>Pacing Functions</h3>
         <p>
-            We implemented dynamic schedulers that adjust the augmentation parameters (<i style="font-family: serif;">N</i>, for Colorful Cutout, Size for Dynamic Cutout) as a linear function of the training epoch <i style="font-family: serif;">t</i>.
+            We implemented dynamic schedulers that adjust the augmentation parameters as a function of the current epoch <i style="font-family: serif;">t</i> and total epochs <i style="font-family: serif;">T<sub>total</sub></i>:
         </p>
         
         <h4>Increasing Difficulty (Curriculum)</h4>
-        <p>
-            For Colorful Cutout (`color_cutout_cur_incr`), we increase the exponent linearly, making the noise finer and more complex. For Dynamic Size (`cutout_dynamic_cur_incr`), we linearly increase the mask size:
-        </p>
-        
-        <center>
-            <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
-              <msub>
-                <mi>L</mi>
-                <mtext>mask</mtext>
-              </msub>
-              <mo stretchy="false">(</mo>
-              <mi>t</mi>
-              <mo stretchy="false">)</mo>
-              <mo>=</mo>
-              <msub>
-                <mi>L</mi>
-                <mtext>min</mtext>
-              </msub>
-              <mo>+</mo>
-              <mfrac>
-                <mi>t</mi>
-                <msub>
-                  <mi>T</mi>
-                  <mtext>total</mtext>
-                </msub>
-              </mfrac>
-              <mo>×</mo>
-              <mo stretchy="false">(</mo>
-              <msub>
-                <mi>L</mi>
-                <mtext>max</mtext>
-              </msub>
-              <mo>-</mo>
-              <msub>
-                <mi>L</mi>
-                <mtext>min</mtext>
-              </msub>
-              <mo stretchy="false">)</mo>
-            </math>
-        </center>
+        <ul style="margin-left: 20px; margin-bottom: 20px;">
+            <li style="margin-bottom: 10px;">
+                <strong>Colorful Cutout:</strong> We increase the exponent linearly from 0 to <code>max_diff</code>. This decreases the <code>region_size</code>, transitioning from a single solid color block (Easy) to a highly fragmented noise grid (Hard).
+            </li>
+            <li>
+                <strong>Dynamic Size:</strong> The mask size <i style="font-family: serif;">L<sub>mask</sub></i> scales linearly from <i style="font-family: serif;">L<sub>min</sub></i> to <i style="font-family: serif;">L<sub>max</sub></i>.
+            </li>
+        </ul>
 
         <h4>Decreasing Difficulty (Anti-Curriculum)</h4>
-        <p>
-            For Colorful Cutout (`color_cutout_cur_decr`), we start with the highest exponent (max complexity) and decrease to 0. For Dynamic Size (`cutout_dynamic_cur_decr`), we start with the largest mask and shrink it, revealing more of the image as training converges:
-        </p>
-        
-        <center>
-            <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
-              <msub>
-                <mi>L</mi>
-                <mtext>mask</mtext>
-              </msub>
-              <mo stretchy="false">(</mo>
-              <mi>t</mi>
-              <mo stretchy="false">)</mo>
-              <mo>=</mo>
-              <msub>
-                <mi>L</mi>
-                <mtext>max</mtext>
-              </msub>
-              <mo>-</mo>
-              <mfrac>
-                <mi>t</mi>
-                <msub>
-                  <mi>T</mi>
-                  <mtext>total</mtext>
-                </msub>
-              </mfrac>
-              <mo>×</mo>
-              <mo stretchy="false">(</mo>
-              <msub>
-                <mi>L</mi>
-                <mtext>max</mtext>
-              </msub>
-              <mo>-</mo>
-              <msub>
-                <mi>L</mi>
-                <mtext>min</mtext>
-              </msub>
-              <mo stretchy="false">)</mo>
-            </math>
-        </center>
-        
-        <p>
-           This allows us to test the trajectory of learning without changing the total amount of augmentation applied over the course of training.
-        </p>
+        <ul style="margin-left: 20px;">
+            <li style="margin-bottom: 10px;">
+                <strong>Colorful Cutout:</strong> We start with the maximum exponent (high-frequency noise) and decrease to 0 (solid block).
+            </li>
+            <li>
+                <strong>Dynamic Size:</strong> The mask size starts at <i style="font-family: serif;">L<sub>max</sub></i> and shrinks to <i style="font-family: serif;">L<sub>min</sub></i>, revealing more of the image as training progresses.
+            </li>
+        </ul>
     </div>
-    <div class="margin-right-block">
-        <strong>Implementation:</strong><br>
-        We utilize a modular argument parser to switch between <code>cur_incr</code> and <code>cur_decr</code> modes.
-    </div>
+    <div class="margin-right-block"></div>
 </div>
 
 <div class="content-margin-container" id="experiments">
     <div class="margin-left-block"></div>
     <div class="main-content-block">
-        <h1>Experiments & Results</h1>
-        <p>
-            <em>(Results pending final training runs)</em>
-        </p>
+        <style>
+            /* LaTeX-style Table CSS */
+            table.academic-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-family: "Georgia", serif;
+                font-size: 15px;
+                color: #333;
+            }
+            table.academic-table th {
+                border-top: 2px solid #333;
+                border-bottom: 1px solid #333;
+                padding: 10px;
+                text-align: center;
+                font-weight: 600;
+                background-color: #fff; /* Ensure transparent/white background */
+            }
+            table.academic-table td {
+                padding: 8px;
+                text-align: center;
+                border: none;
+            }
+            /* Add a bottom border to the last row of the table */
+            table.academic-table tr:last-child td {
+                border-bottom: 2px solid #333;
+            }
+            /* Subtle separator between augmentation groups */
+            tr.group-divider td {
+                border-bottom: 1px solid #e0e0e0;
+            }
+            /* Left-align the first column for readability */
+            table.academic-table td:first-child, table.academic-table th:first-child {
+                text-align: left;
+                padding-left: 15px;
+            }
+        </style>
+
+        <h1>4. Results</h1>
         
+        <h3>4.1 Overall Performance by Dataset and Augmentation Family</h3>
         <p>
-            We compare the test accuracy of ResNet50 on CIFAR-10 across three conditions: Static Baseline, Increasing Difficulty, and Decreasing Difficulty.
+            The following tables summarize the mean test accuracy and the range (min–max) across multiple random seeds.
+        </p>
+
+        <h4>Table 1: CIFAR-10 Performance</h4>
+        <table class="academic-table">
+            <thead>
+                <tr>
+                    <th>Augmentation Family</th>
+                    <th>Schedule</th>
+                    <th>Runs (n)</th>
+                    <th>Mean Acc.</th>
+                    <th>Std Dev</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="3" style="vertical-align: middle;"><strong>COLOR_CUTOUT</strong></td>
+                    <td>no_cur</td>
+                    <td>3</td>
+                    <td>0.75</td>
+                    <td>0.32</td>
+                    <td>0.38</td>
+                    <td>0.96</td>
+                </tr>
+                <tr>
+                    <td>incr</td>
+                    <td>2</td>
+                    <td>0.61</td>
+                    <td>0.42</td>
+                    <td>0.31</td>
+                    <td>0.90</td>
+                </tr>
+                <tr class="group-divider">
+                    <td>decr</td>
+                    <td>3</td>
+                    <td>0.72</td>
+                    <td>0.37</td>
+                    <td>0.30</td>
+                    <td>0.95</td>
+                </tr>
+                
+                <tr>
+                    <td rowspan="2" style="vertical-align: middle;"><strong>CUTOUT_DYNAMIC</strong></td>
+                    <td>incr</td>
+                    <td>3</td>
+                    <td>0.74</td>
+                    <td>0.34</td>
+                    <td>0.35</td>
+                    <td>0.96</td>
+                </tr>
+                <tr class="group-divider">
+                    <td>decr</td>
+                    <td>3</td>
+                    <td>0.71</td>
+                    <td>0.38</td>
+                    <td>0.28</td>
+                    <td>0.95</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2" style="vertical-align: middle;"><strong>DYNAMIC_CONTRAST</strong></td>
+                    <td>incr</td>
+                    <td>3</td>
+                    <td>0.72</td>
+                    <td>0.36</td>
+                    <td>0.30</td>
+                    <td>0.95</td>
+                </tr>
+                <tr>
+                    <td>decr</td>
+                    <td>3</td>
+                    <td>0.71</td>
+                    <td>0.37</td>
+                    <td>0.28</td>
+                    <td>0.95</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Key Observations for CIFAR-10:</strong></p>
+        <ul>
+            <li><strong>Performance Parity:</strong> Best-case performance is essentially identical across all configurations (Max $\approx 0.96$). Conditional on the run converging successfully, curriculum direction barely matters.</li>
+            <li><strong>Impact of Failed Runs:</strong> The low mean scores are driven by specific seeds failing to converge (Min $\approx 0.30$). If we filter for "successful" runs (accuracy $> 0.8$), all configurations cluster tightly in a narrow band of $0.93 \pm 0.02$.</li>
+        </ul>
+
+        <h4>Table 2: CIFAR-100 Performance</h4>
+        <table class="academic-table">
+            <thead>
+                <tr>
+                    <th>Augmentation Family</th>
+                    <th>Schedule</th>
+                    <th>Runs (n)</th>
+                    <th>Mean Acc.</th>
+                    <th>Std Dev</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="3" style="vertical-align: middle;"><strong>COLOR_CUTOUT</strong></td>
+                    <td>no_cur</td>
+                    <td>2</td>
+                    <td>0.73</td>
+                    <td>0.12</td>
+                    <td>0.64</td>
+                    <td>0.81</td>
+                </tr>
+                <tr>
+                    <td>incr</td>
+                    <td>8</td>
+                    <td>0.66</td>
+                    <td>0.06</td>
+                    <td>0.64</td>
+                    <td>0.81</td>
+                </tr>
+                <tr class="group-divider">
+                    <td>decr</td>
+                    <td>2</td>
+                    <td>0.73</td>
+                    <td>0.11</td>
+                    <td>0.65</td>
+                    <td>0.80</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2" style="vertical-align: middle;"><strong>CUTOUT_DYNAMIC</strong></td>
+                    <td>incr</td>
+                    <td>2</td>
+                    <td>0.71</td>
+                    <td>0.14</td>
+                    <td>0.61</td>
+                    <td>0.81</td>
+                </tr>
+                <tr class="group-divider">
+                    <td>decr</td>
+                    <td>2</td>
+                    <td>0.71</td>
+                    <td>0.14</td>
+                    <td>0.62</td>
+                    <td>0.81</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="2" style="vertical-align: middle;"><strong>DYNAMIC_CONTRAST</strong></td>
+                    <td>incr</td>
+                    <td>2</td>
+                    <td>0.68</td>
+                    <td>0.16</td>
+                    <td>0.56</td>
+                    <td>0.79</td>
+                </tr>
+                <tr>
+                    <td>decr</td>
+                    <td>2</td>
+                    <td>0.69</td>
+                    <td>0.17</td>
+                    <td>0.57</td>
+                    <td>0.80</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Key Observations for CIFAR-100:</strong></p>
+        <ul>
+            <li><strong>Clustered Peak Performance:</strong> The best runs across all configurations consistently reach $\approx 0.79–0.81$. Once the model converges, neither curriculum direction nor augmentation family dominates the final accuracy.</li>
+            <li><strong>Degradation in Means:</strong> Lower mean accuracy in aggressive settings (e.g., Dynamic Contrast) reflects optimization instability rather than a lower performance ceiling. Strong augmentations plus our specific optimizer schedule occasionally pushed the model into worse minima.</li>
+        </ul>
+
+        <h3>4.2 Effect of Curriculum Direction</h3>
+        <p>
+            Differences in mean accuracy between curricula are largely driven by occasional "bad runs" rather than systematic shifts in the typical "good" performance.
+        </p>
+        <ul>
+            <li>On CIFAR-10, all "successful" runs fall within $\approx 0.93 \pm 0.02$.</li>
+            <li>On CIFAR-100, all "successful" runs cluster around $\approx 0.80–0.81$.</li>
+        </ul>
+        <p>
+            This supports the statement that augmentation curriculum does not materially change the quality of the good minima the model can reach.
+        </p>
+
+        <h3>4.3 Training Stability</h3>
+        <p>
+            This is where the most interesting story emerges. We define a "bad run" as test accuracy below 0.5 on CIFAR-10 or below 0.7 on CIFAR-100.
+        </p>
+        <ul>
+            <li>Some configs (e.g., strong dynamic + contrast on CIFAR-100) show more fragile behavior: one seed around $0.56$ and one around $0.80$.</li>
+            <li>On CIFAR-10, most configurations have the same pattern: two seeds $\approx 0.90+$ and one $\approx 0.30$.</li>
+        </ul>
+        <p>
+            <strong>Interpretation:</strong> Strong augmentations occasionally lead to optimization failures. However, this effect is not clearly aligned with incr vs decr. Both can have bad seeds; the difference is subtle and not obviously significant given our sample sizes.
+        </p>
+
+        <h3>4.4 Comparing Augmentation Families</h3>
+        <ul>
+            <li><strong>CIFAR-10:</strong> Best-case performance is essentially tied ($\approx 0.95$).</li>
+            <li><strong>CIFAR-100:</strong> Dynamic and Color Cutout have similar maxima ($\approx 0.81$). Dynamic Contrast is slightly lower on average due to stability issues.</li>
+        </ul>
+        <p>
+            <strong>Conclusion:</strong> The stronger, more structured augmentations (CUTOUT_DYNAMIC_CONTRAST) do not give a clear accuracy gain in this setup. They may increase instability without a compensating boost in peak performance.
         </p>
     </div>
     <div class="margin-right-block">
-        Visualizations are critical. Ensure captions explain the main takeaway of the figure.
+        Visualizations of test accuracy over epochs could further illustrate the stability differences.
     </div>
 </div>
 
