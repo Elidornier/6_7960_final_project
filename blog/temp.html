@@ -213,7 +213,7 @@
             <a href="#intro">Introduction</a><br><br>
             <a href="#related_work">Related Work</a><br><br>
             <a href="#methodology">Methodology</a><br><br>
-            <a href="#experiments">Results</a><br><br>
+            <a href="#experiments">Experiments & Results</a><br><br>
             <a href="#discussion">Discussion</a><br><br>
         </div>
     </div>
@@ -225,11 +225,18 @@
             Deep learning's remarkable success in computer vision can be attributed in large part to the capacity of powerful, over-parameterized models such as ResNet <a href="#ref_1">[1]</a> to generalize effectively beyond their training data. Consequently, Data Augmentation has emerged as a cornerstone technique to bridge the generalization gap, artificially expanding the training distribution through stochastic transformations like blurring, cropping, and occlusion.
         </p>
         <p>
-            In our homework, we explored flipping and found it to be an interesting topic, deciding to dig deeper. However, standard data augmentation pipelines typically treat the training process as <strong>static</strong>. Augmentations are applied with random magnitudes drawn from a fixed distribution, regardless of the model's current learning state. This creates a fundamental misalignment between the data and the model:
+            In our previous homework, we explored the critical role of data augmentation in enhancing model performance and shaping representation with implemented transformations such as <code>RandomHorizontalFlip</code> and <code>RandomCrop</code> on the CIFAR-10 dataset. Through this, we observed that while augmentation made fitting the training data more challenging, it could effectively reduce overfitting and improve validation and test accuracy, demonstrating better generalization. Motivated by these findings on how data manipulation fundamentally alters the decision boundaries and distinct properties of learned features, we decided to dig deeper into this topic.
         </p>
-        <ul>
-            <li>In <strong>early training stages</strong>, the model is trying to learn basic, low-level features like edges or shapes. Strong augmentations (such as massive cutout holes or high-frequency noise) might introduce excessive information loss, essentially "blinding" the model before it can see.</li>
-            <li>In <strong>later training stages</strong>, the model has likely memorized the training data. Weak augmentations may fail to provide sufficient regularization, leading to overfitting.</li>
+        <p>
+            However, standard data augmentation pipelines typically treat the training process as <strong>static</strong>. Augmentations are applied with random magnitudes drawn from a fixed distribution, regardless of the model's current learning state. This creates a fundamental misalignment between the data and the model:
+        </p>
+        <ul style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 10px;">
+                In <strong>early training stages</strong>, the model is trying to learn basic, low-level features like edges or shapes. Strong augmentations (such as massive cutout holes or high-frequency noise) might introduce excessive information loss, essentially "blinding" the model before it can see.
+            </li>
+            <li>
+                In <strong>later training stages</strong>, the model has likely memorized the training data. Weak augmentations may fail to provide sufficient regularization, leading to overfitting.
+            </li>
         </ul>
         <p>
             We hypothesize that the <strong>timing</strong> of difficulty is just as critical as the difficulty itself. Just as a human student would struggle if handed a complex calculus problem on day one, a neural network might struggle to converge if the signal-to-noise ratio is too low at initialization.
@@ -239,41 +246,40 @@
         <p>
             Curriculum Learning, as proposed by Bengio et al. <a href="#ref_3">[3]</a>, formalizes this intuition. It suggests that models learn more effectively when samples are presented in a meaningful order of increasing difficulty ("Easy-to-Hard"). Recent adaptive frameworks like EntAugment <a href="#ref_5">[5]</a> and ObjBlur <a href="#ref_4">[4]</a> have successfully applied this principle to data augmentation.
         </p>
-
-        <h3>Anti-Curriculum</h3>
         <p>
             Conversely, a counter-intuitive line of research suggests an "Anti-Curriculum" (Hard-to-Easy) approach. Theoretical work by Maltser <a href="#ref_6">[6]</a> indicates that exposing models to difficult, strongly augmented samples <strong>early on</strong> might force the learning of more robust, shape-invariant features. By front-loading the difficulty, the model may be prevented from learning "shortcuts" (like superficial texture bias) during its initial phase of high plasticity.
         </p>
 
         <h3>Our Contribution</h3>
         <p>
-            In this work, we systematically investigate the <strong>trajectory of difficulty</strong> in data augmentation. We do not merely ask <em>if</em> curriculum learning helps; we ask <em>which trajectory</em> is optimal. We define our core question: <strong>Should augmentation difficulty increase or decrease over training, and does the direction of this curriculum significantly affect generalization on CIFAR-10/100?</strong>
+            In this work, we systematically investigate the <strong>trajectory of difficulty</strong> in data augmentation. We do not merely ask <em>if</em> curriculum learning helps; we ask <em>which trajectory</em> is optimal. We define our core question: <strong>Should augmentation difficulty increase or decrease over training, and does the direction of this curriculum significantly affect generalization on CIFAR-10/100?</strong> We also added tests with a low data regime to simulate the environment when quality images or other types of data are hard to collect.
         </p>
-        <p>
-            We briefly preview our main findings:
-        </p>
-        <ul>
-            <li><strong>Performance Parity:</strong> Contrary to the intuitive expectation, no curriculum direction consistently outperformed the others in terms of best-case test accuracy. All curricula (increasing, decreasing, static) reach similar best-case accuracy.</li>
-            <li><strong>Stability over Performance:</strong> The dominant effect of strong augmentation curricula in this regime is on training stability (the frequency of failed runs), not on the quality of the final solution.</li>
-            <li><strong>Magnitude of Effect:</strong> Any advantage of "Easy-to-Hard" is small relative to the base hyperparameters and the inherent variance of SGD.</li>
-        </ul>
-        <p>
-            We explore two distinct axes of difficulty:
-        </p>
-        <ol>
-            <li><strong>Complexity-based:</strong> Using <strong>Colorful Cutout</strong> <a href="#ref_7">[7]</a> to vary the information entropy of the occluded region.</li>
-            <li><strong>Occlusion-based:</strong> Using <strong>Dynamic Cutout Size</strong>, a method we implemented to vary the spatial extent of information loss.</li>
+        
+        <p>We explore two distinct axes of difficulty:</p>
+        <ol style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 10px;">
+                <strong>Complexity-based:</strong> Using Colorful Cutout <a href="#ref_7">[7]</a> to vary the information entropy of the occluded region.
+            </li>
+            <li>
+                <strong>Occlusion-based:</strong> Using Dynamic Cutout Size, a method we implemented to vary the spatial extent of information loss.
+            </li>
         </ol>
+
+        <p>and compare three distinct training regimes:</p>
+        <ol style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 10px;">
+                <strong>Static Baseline:</strong> Random augmentation magnitude (Standard practice).
+            </li>
+            <li style="margin-bottom: 10px;">
+                <strong>Curriculum (Easy &rarr; Hard):</strong> Gradually increasing complexity/occlusion.
+            </li>
+            <li>
+                <strong>Anti-Curriculum (Hard &rarr; Easy):</strong> Gradually decreasing complexity/occlusion.
+            </li>
+        </ol>
+
         <p>
-            We compare three distinct training regimes:
-        </p>
-        <ul>
-            <li><strong>Static Baseline:</strong> Random augmentation magnitude (Standard practice).</li>
-            <li><strong>Curriculum (Easy &rarr; Hard):</strong> Gradually increasing complexity/occlusion.</li>
-            <li><strong>Anti-Curriculum (Hard &rarr; Easy):</strong> Gradually decreasing complexity/occlusion.</li>
-        </ul>
-        <p>
-            By training ResNet50 architectures on CIFAR-10 <a href="#ref_8">[8]</a> and CIFAR-100 under these varying dynamics, we aim to decouple the impact of augmentation <em>type</em> from augmentation <em>scheduling</em>.
+            By training ResNet50 architectures on CIFAR-10 and CIFAR-100 under these varying dynamics, we aim to decouple the impact of augmentation type from augmentation scheduling.
         </p>
         <img src="./images/your_intro_diagram.png" width=512px/>
     </div>
@@ -346,7 +352,7 @@
             Given an input image <i style="font-family: serif;">x</i> &in; &#8477;<sup>3 &times; H &times; W</sup>, the backbone produces a feature tensor which we globally pool and flatten into a vector <i style="font-family: serif;">h</i> &in; &#8477;<sup>d</sup>. The final prediction layer is a small MLP classifier. We train the model to minimize cross-entropy loss with label smoothing to mitigate overconfidence.
         </p>
 
-        <h3>Augmentations</h3>
+        <h3>3.2 Augmentations</h3>
         <p>
             We investigated two types of augmentation. Each has a difficulty level we can change during training.
         </p>
@@ -404,30 +410,113 @@
             </li>
         </ul>
 
-        <h3>Pacing Functions</h3>
+        <h3>3.3 Pacing Functions</h3>
         <p>
-            We implemented dynamic schedulers that adjust the augmentation parameters as a function of the current epoch <i style="font-family: serif;">t</i> and total epochs <i style="font-family: serif;">T<sub>total</sub></i>:
+            We implemented dynamic schedulers that adjust the augmentation parameters (<i style="font-family: serif;">N</i>, for Colorful Cutout, Size for Dynamic Cutout) as a linear function of the training epoch <i style="font-family: serif;">t</i>.
         </p>
         
         <h4>Increasing Difficulty (Curriculum)</h4>
-        <ul style="margin-left: 20px; margin-bottom: 20px;">
-            <li style="margin-bottom: 10px;">
-                <strong>Colorful Cutout:</strong> We increase the exponent linearly from 0 to <code>max_diff</code>. This decreases the <code>region_size</code>, transitioning from a single solid color block (Easy) to a highly fragmented noise grid (Hard).
-            </li>
-            <li>
-                <strong>Dynamic Size:</strong> The mask size <i style="font-family: serif;">L<sub>mask</sub></i> scales linearly from <i style="font-family: serif;">L<sub>min</sub></i> to <i style="font-family: serif;">L<sub>max</sub></i>.
-            </li>
-        </ul>
+        <p>
+            For Colorful Cutout (`color_cutout_cur_incr`), we increase the exponent linearly, making the noise finer and more complex. For Dynamic Size (`cutout_dynamic_cur_incr`), we linearly increase the mask size:
+        </p>
+        
+        <center>
+            <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+              <msub>
+                <mi>L</mi>
+                <mtext>mask</mtext>
+              </msub>
+              <mo stretchy="false">(</mo>
+              <mi>t</mi>
+              <mo stretchy="false">)</mo>
+              <mo>=</mo>
+              <msub>
+                <mi>L</mi>
+                <mtext>min</mtext>
+              </msub>
+              <mo>+</mo>
+              <mfrac>
+                <mi>t</mi>
+                <msub>
+                  <mi>T</mi>
+                  <mtext>total</mtext>
+                </msub>
+              </mfrac>
+              <mo>×</mo>
+              <mo stretchy="false">(</mo>
+              <msub>
+                <mi>L</mi>
+                <mtext>max</mtext>
+              </msub>
+              <mo>-</mo>
+              <msub>
+                <mi>L</mi>
+                <mtext>min</mtext>
+              </msub>
+              <mo stretchy="false">)</mo>
+            </math>
+        </center>
 
         <h4>Decreasing Difficulty (Anti-Curriculum)</h4>
-        <ul style="margin-left: 20px;">
-            <li style="margin-bottom: 10px;">
-                <strong>Colorful Cutout:</strong> We start with the maximum exponent (high-frequency noise) and decrease to 0 (solid block).
-            </li>
-            <li>
-                <strong>Dynamic Size:</strong> The mask size starts at <i style="font-family: serif;">L<sub>max</sub></i> and shrinks to <i style="font-family: serif;">L<sub>min</sub></i>, revealing more of the image as training progresses.
-            </li>
+        <p>
+            For Colorful Cutout (`color_cutout_cur_decr`), we start with the highest exponent (max complexity) and decrease to 0. For Dynamic Size (`cutout_dynamic_cur_decr`), we start with the largest mask and shrink it, revealing more of the image as training converges:
+        </p>
+        
+        <center>
+            <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+              <msub>
+                <mi>L</mi>
+                <mtext>mask</mtext>
+              </msub>
+              <mo stretchy="false">(</mo>
+              <mi>t</mi>
+              <mo stretchy="false">)</mo>
+              <mo>=</mo>
+              <msub>
+                <mi>L</mi>
+                <mtext>max</mtext>
+              </msub>
+              <mo>-</mo>
+              <mfrac>
+                <mi>t</mi>
+                <msub>
+                  <mi>T</mi>
+                  <mtext>total</mtext>
+                </msub>
+              </mfrac>
+              <mo>×</mo>
+              <mo stretchy="false">(</mo>
+              <msub>
+                <mi>L</mi>
+                <mtext>max</mtext>
+              </msub>
+              <mo>-</mo>
+              <msub>
+                <mi>L</mi>
+                <mtext>min</mtext>
+              </msub>
+              <mo stretchy="false">)</mo>
+            </math>
+        </center>
+        
+        <p>
+           This allows us to test the trajectory of learning without changing the total amount of augmentation applied over the course of training.
+        </p>
+
+        <h3>3.4 Test-Time Color Robustness</h3>
+        <p>
+            To better understand if our curriculum strategies help the model generalize, we investigated Color Robustness. We choose color because we include Colorful Cutout as one of our augmentations, and we wanted to see if models trained with a specific difficulty trajectory are more resistant to color changes they haven't seen before.
+        </p>
+        <p>
+            We simulated this by applying a <strong>Color Jitter</strong> transformation to the testing images on CIFAR-10 low data. This shifts the brightness, contrast, saturation, and hue without changing the image label. We used a severity scale from 1 to 5 to control how strong the shift is.
+        </p>
+        <ul style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 8px;"><strong>Brightness, Contrast, Saturation:</strong> Adjusted by 0.2 &times; severity</li>
+            <li style="margin-bottom: 8px;"><strong>Hue:</strong> Adjusted by 0.05 &times; severity</li>
         </ul>
+        <p>
+            This allows us to test if the "hard" or "easy" training schedules create features that are stable even when the image colors look different.
+        </p>
     </div>
     <div class="margin-right-block"></div>
 </div>
