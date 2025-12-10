@@ -309,7 +309,7 @@
             A key subset of Curriculum Data Augmentation focuses specifically on scheduling the <strong>intensity</strong> or <strong>magnitude</strong> of transformations. Wei et al. (2021) demonstrated that gradually increasing the magnitude of distortions (e.g., rotation angle, shear intensity) correlates with improved generalization <a href="#ref_9">[9]</a>.
         </p>
         <p>
-            In the context of occlusion methods, this magnitude corresponds directly to the <strong>size</strong> of the erased region. While early occlusion methods like Cutout <a href="#ref_2">[2]</a> and Random Erasing utilized fixed or randomly sampled sizes, later works such as Hide-and-Seek highlighted the delicate balance required between occlusion and feature retention. Our <strong>Dynamic Cutout Size</strong> implementation serves as a direct instantiation of magnitude-based curriculum for occlusion: we explicitly schedule the bounding box dimension ($W \times H$) as a function of the training epoch.
+            In the context of occlusion methods, this magnitude corresponds directly to the <strong>size</strong> of the erased region. While early occlusion methods like Cutout <a href="#ref_2">[2]</a> and Random Erasing utilized fixed or randomly sampled sizes, later works such as Hide-and-Seek highlighted the delicate balance required between occlusion and feature retention. Our <strong>Dynamic Cutout Size</strong> implementation serves as a direct instantiation of magnitude-based curriculum for occlusion: we explicitly schedule the bounding box dimension as a function of the training epoch.
         </p>
 
         <h3>Directionality</h3>
@@ -638,7 +638,7 @@
         <p><strong>CIFAR-10 (10% Data)</strong></p>
         <ul style="margin-left: 20px; line-height: 1.6em;">
             <li style="margin-bottom: 8px;"><strong>Winner:</strong> Colorful Cutout Decreasing Difficulty (91.06%)</li>
-            <li style="margin-bottom: 8px;"><strong>Trend:</strong> We observed a weak pattern where Decreasing > Increasing > Static.</li>
+            <li style="margin-bottom: 8px;"><strong>Trend:</strong> We observed a weak pattern where Decreasing > Increasing > No Curriculum.</li>
         </ul>
 
         <p><strong>CIFAR-100 (10% Data)</strong></p>
