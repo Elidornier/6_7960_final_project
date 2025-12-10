@@ -394,14 +394,14 @@
             <li style="margin-bottom: 25px;">
                 <strong>B. Dynamic Cutout Size (Occlusion-based Difficulty)</strong>
                 <div style="margin-top: 5px; margin-bottom: 10px;">
-                    This method varies the spatial extent of the occlusion. We dynamically calculate the side length of the square mask, <i style="font-family: serif;">L<sub>mask</sub></i>, based on the current epoch.
+                    This method varies the spatial extent of the occlusion. We dynamically calculate the side length of the square cutout, <i style="font-family: serif;">L<sub>cutout</sub></i>, based on the current epoch.
                 </div>
                 <ul style="list-style-type: circle; margin-left: 20px;">
                     <li style="margin-bottom: 8px;">
-                        <strong>Mechanism:</strong> We linearly interpolate the mask size between a minimum (<i style="font-family: serif;">L<sub>min</sub></i>) and maximum (<i style="font-family: serif;">L<sub>max</sub></i>) value.
+                        <strong>Mechanism:</strong> We linearly interpolate the cutout size between a minimum (<i style="font-family: serif;">L<sub>min</sub></i>) and maximum (<i style="font-family: serif;">L<sub>max</sub></i>) value.
                     </li>
                     <li style="margin-bottom: 8px;">
-                        <strong>Difficulty Metric:</strong> Larger <i style="font-family: serif;">L<sub>mask</sub></i> corresponds to greater information loss (higher difficulty).
+                        <strong>Difficulty Metric:</strong> Larger <i style="font-family: serif;">L<sub>coutout</sub></i> corresponds to greater information loss (higher difficulty).
                     </li>
                     <li style="margin-bottom: 8px;">
                         We implemented a variant of this augmentation with a larger increase in side length in each step named Dynamic Contrast.
@@ -422,14 +422,14 @@
         
         <h4>Increasing Difficulty (Curriculum)</h4>
         <p>
-            For Colorful Cutout (`color_cutout_cur_incr`), we increase the exponent linearly, making the noise finer and more complex. For Dynamic Size (`cutout_dynamic_cur_incr`), we linearly increase the mask size:
+            For Colorful Cutout (`color_cutout_cur_incr`), we increase the exponent linearly, making the noise finer and more complex. For Dynamic Size (`cutout_dynamic_cur_incr`), we linearly increase the cutout size:
         </p>
         
         <center>
             <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
               <msub>
                 <mi>L</mi>
-                <mtext>mask</mtext>
+                <mtext>cutout</mtext>
               </msub>
               <mo stretchy="false">(</mo>
               <mi>t</mi>
@@ -464,14 +464,14 @@
 
         <h4>Decreasing Difficulty (Anti-Curriculum)</h4>
         <p>
-            For Colorful Cutout (`color_cutout_cur_decr`), we start with the highest exponent (max complexity) and decrease to 0. For Dynamic Size (`cutout_dynamic_cur_decr`), we start with the largest mask and shrink it, revealing more of the image as training converges:
+            For Colorful Cutout (`color_cutout_cur_decr`), we start with the highest exponent (max complexity) and decrease to 0. For Dynamic Size (`cutout_dynamic_cur_decr`), we start with the largest cutout and shrink it, revealing more of the image as training converges:
         </p>
         
         <center>
             <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
               <msub>
                 <mi>L</mi>
-                <mtext>mask</mtext>
+                <mtext>cutout</mtext>
               </msub>
               <mo stretchy="false">(</mo>
               <mi>t</mi>
@@ -642,7 +642,7 @@
         </ul>
 
         <p><strong>CIFAR-100 (10% Data)</strong></p>
-        <p>This was our most challenging setting—hard task, scarce data.</p>
+        <p>This is our most challenging setting with more complicate task with less data.</p>
 
         <table class="academic-table">
             <thead>
