@@ -162,6 +162,21 @@
         color: #ffffff !important; /* Bright white on hover */
     }
 
+    /* 12. FIGURE & CAPTION */
+    figure {
+        margin: 20px 0;      /* Adds vertical spacing */
+        display: table;      /* Helps image and caption stick together */
+    }
+
+    figcaption {
+        font-family: sans-serif; /* Changes font to be distinct from body */
+        font-size: 0.9rem;       /* Makes it slightly smaller than body text */
+        color: #666;             /* Makes it dark gray instead of black */
+        font-style: italic;      /* Classic caption look */
+        text-align: center;      /* Centers the text under the image */
+        margin-top: 8px;         /* Adds breathing room between img and text */
+    }
+
 </style>
 
 <title>Trajectory of Augmentation Difficulty</title>
@@ -189,8 +204,8 @@
 <div class="content-margin-container" style="margin-top: 60px; margin-bottom: 60px;">
     <div class="margin-left-block"></div>
     <div class="main-content-block">
-        <h1 style="font-size: 50px; line-height: 1.1em; margin-bottom: 20px; font-family: 'Helvetica Neue', Helvetica, sans-serif;">
-            Investigating the Trajectory<br>of Augmentation Difficulty
+        <h1 style="font-size: 45px; line-height: 1.2em; margin-bottom: 20px; font-family: 'Helvetica Neue', Helvetica, sans-serif;">
+            Direction of Difficulty: Evaluating Curriculum vs. Anti-Curriculum<br> Augmentation Strategies
         </h1>
         
         <div style="font-family: 'Helvetica Neue', sans-serif; font-size: 18px; color: #555;">
@@ -297,32 +312,37 @@
     <div class="main-content-block">
         <h1>2. Related Work</h1>
         <p>
-            Recent research has pivoted toward <strong>adaptive</strong> strategies that integrate curriculum learning: models learn faster and better when training examples are ordered from easy to hard <a href="#ref_3">[3]</a>.
+            The field of deep learning has evolved from relying on static, manually designed augmentation pipelines to utilizing automated and adaptive strategies to improve generalization <a href="#ref_10">[10]</a>. While classic augmentations like Cutout <a href="#ref_2">[2]</a> and Random Erasing typically apply transformations with fixed probabilities throughout training, Recent researches are mostly investigating adaptive strategies that integrate augmentation curriculum learning. They claim models learn faster and better when augmented training data are ordered from easy to hard while epoch increases <a href="#ref_3">[3]</a>.
+        </p>
+
+        <h3>Adaptive Curriculum Strategies</h3>
+        <p>
+            Standard Curriculum Learning (CL) advocates for an "Easy-to-Hard" progression. This approach is theoretically supported by works such as MADAug (Model-Adaptive Data Augmentation) <a href="#ref_11">[11]</a>, which empirically demonstrated that models in early training stages lack the capacity to interpret strongly augmented samples; introducing excessive noise too early can destabilize convergence or destroy gradients. Consequently, recent frameworks have operationalized this "Easy-to-Hard" principle:
         </p>
         <ul>
-            <li><strong>ObjBlur <a href="#ref_4">[4]</a>:</strong> Introduces a curriculum for layout-to-image generation by progressively moving from strong blurring (low-frequency signals) to cleaner images (high-frequency details).</li>
-            <li><strong>EntAugment <a href="#ref_5">[5]</a>:</strong> Proposes a tuning-free framework that adapts augmentation magnitude based on sample difficulty. It utilizes an entropy-based metric to assess model confidence, applying lighter augmentations to hard samples early in training and intensifying the magnitude as the model generalizes.</li>
+            <li><strong>ObjBlur <a href="#ref_4">[4]</a>:</strong> Applies this to generative modeling by transitioning from strong blurring (learning low-frequency global structures) to sharp images (refining high-frequency details).</li>
+            <li><strong>EntAugment <a href="#ref_5">[5]</a>:</strong> Introduces a tuning-free framework that scales augmentation magnitude based on real-time model confidence (entropy), ensuring that hard samples remain lightly augmented until the model is robust enough to handle them.</li>
         </ul>
 
-        <h3>Magnitude-Based Scheduling</h3>
+        <h3>Magnitude and Policy Scheduling</h3>
         <p>
-            A key subset of Curriculum Data Augmentation focuses specifically on scheduling the <strong>intensity</strong> or <strong>magnitude</strong> of transformations. Wei et al. (2021) demonstrated that gradually increasing the magnitude of distortions (e.g., rotation angle, shear intensity) correlates with improved generalization <a href="#ref_9">[9]</a>.
+            A parallel line of research focuses on scheduling the intensity of transformations over time. Wei et al. (2021) demonstrated that gradually increasing distortion magnitude correlates with improved generalization <a href="#ref_9">[9]</a>. Similarly, automated search methods like Population Based Augmentation (PBA) <a href="#ref_12">[12]</a> often converge on policy schedules that start with weak augmentations and linearly increase strength, suggesting that "increasing magnitude" is a naturally emerging property of optimal training schedules.
         </p>
         <p>
-            In the context of occlusion methods, this magnitude corresponds directly to the <strong>size</strong> of the erased region. While early occlusion methods like Cutout <a href="#ref_2">[2]</a> and Random Erasing utilized fixed or randomly sampled sizes, later works such as Hide-and-Seek highlighted the delicate balance required between occlusion and feature retention. Our <strong>Dynamic Cutout Size</strong> implementation serves as a direct instantiation of magnitude-based curriculum for occlusion: we explicitly schedule the bounding box dimension as a function of the training epoch.
+            Our Dynamic Cutout Size implementation serves as a direct instantiation of magnitude-based curriculum for occlusion. We explicitly schedule the cutout box dimension as a function of the training epoch. Unlike PBA, which learns a schedule via expensive search, we explicitly map the bounding box dimension to the training epoch, allowing us to isolate the effect of trajectory magnitude without the confounding variables of a black-box search policy.
         </p>
 
-        <h3>Directionality</h3>
+        <h3>Direction of Difficulty: A Gap in Literature</h3>
         <p>
-            Finally, a critical, yet under-explored question is the <strong>trajectory</strong> of augmentation difficulty. While standard CL dictates an "Easy-to-Hard" schedule, recent work by Maltser on <strong>Augmentation Curriculum Learning (ACL)</strong> investigates alternative pacing, including "Anti-Curriculum" (Hard-to-Easy) strategies <a href="#ref_6">[6]</a>. Maltser's findings suggest that explicitly scoring and ordering augmentations can outperform random selection, but the optimal direction remains a subject of debate.
+            Critically, the optimal trajectory of augmentation difficulty remains an open question. While the consensus favors "Easy-to-Hard," an emerging "Anti-Curriculum" perspective challenges this view. Theoretical work by Maltser on Augmentation Curriculum Learning (ACL) <a href="#ref_6">[6]</a> suggests that explicitly ordering augmentations outperforms random selection, but leaves the optimal direction ambiguous. Furthermore, methods like Anti-Curriculum Pseudo-Labelling (ACPL) <a href="#ref_13">[13]</a> have shown that in semi-supervised regimes, prioritizing "hard," informative samples early prevents the model from collapsing into trivial solutions or memorizing easy patterns.
         </p>
         <p>
-            In this project, we utilize <strong>Colorful Cutout</strong> <a href="#ref_7">[7]</a> to test these conflicting hypotheses. By progressively dividing the erasure box into smaller sub-regions, Colorful Cutout allows us to control the "complexity" of the noise. As the number of sub-regions increases, the sample becomes more "tangled" and difficult, naturally forming a difficulty gradient that we can invert or scale.
+            This reveals a gap in prior research: there is limited systematic study decoupling the <em>type</em> of augmentation from the <em>direction</em> of its schedule in standard supervised learning. In this project, we experiment with both <strong>Colorful Cutout</strong> <a href="#ref_7">[7]</a> (varying complexity) and <strong>Dynamic Cutout</strong> (varying occlusion size) to rigorously test these conflicting hypotheses. By inverting the trajectory of these two distinct difficulty axes, we aim to determine whether the "Anti-Curriculum" benefits observed in semi-supervised domains translate to robustness in standard supervised classification.
         </p>
     </div>
     <div class="margin-right-block">
         <strong>Key Concept:</strong><br>
-        <em>Magnitude Scheduling</em>: Varying the intensity (size) of an augmentation over time.
+        <em>Anti-Curriculum</em>: A training strategy that front-loads difficult samples to force robust feature learning early on.
     </div>
 </div>
 
@@ -389,8 +409,17 @@
                     </li>
                 </ul>
             </li>
-            <img src="./images/color_incr.png" width=700px/>
-            <img src="./images/color_decr.png" width=700px/>
+
+            <figure>
+                <img src="./images/color_incr.png" alt="A view of snowy mountains at sunset">
+                <figcaption>Augmentation Type: Colorful Cutout Visualization for Increasing Difficulty.</figcaption>
+            </figure>
+
+            <figure>
+                <img src="./images/color_decr.png" alt="A view of snowy mountains at sunset">
+                <figcaption>Augmentation Type: Colorful Cutout Visualization for Decreasing Difficulty.</figcaption>
+            </figure>
+
             <li style="margin-bottom: 25px;">
                 <strong>B. Dynamic Cutout Size (Occlusion-based Difficulty)</strong>
                 <div style="margin-top: 5px; margin-bottom: 10px;">
@@ -407,10 +436,24 @@
                         We implemented a variant of this augmentation with a larger increase in side length in each step named Dynamic Contrast.
                     </li>
                 </ul>
-                <img src="./images/dynamic_incr.png" width=700px/>
-                <img src="./images/dynamic_decr.png" width=700px/>
-                <img src="./images/contrast_incr.png" width=700px/>
-                <img src="./images/contrast_decr.png" width=700px/>
+                <figure>
+                    <img src="./images/dynamic_incr.png" alt="A view of snowy mountains at sunset">
+                    <figcaption>Augmentation Type: Dynamic Cutout Visualization for Increasing Difficulty.</figcaption>
+                </figure>
+
+                <figure>
+                    <img src="./images/dynamic_decr.png" alt="A view of snowy mountains at sunset">
+                    <figcaption>Augmentation Type: Dynamic Cutout Visualization for Decreasing Difficulty.</figcaption>
+                </figure>
+                <figure>
+                    <img src="./images/contrast_incr.png" alt="A view of snowy mountains at sunset">
+                    <figcaption>Dynamic Cutout Visualization with Greater Contrast, Increasing Difficulty.</figcaption>
+                </figure>
+
+                <figure>
+                    <img src="./images/contrast_decr.png" alt="A view of snowy mountains at sunset">
+                    <figcaption>Dynamic Cutout Visualization with Greater Contrast, Decreasing Difficulty.</figcaption>
+                </figure>
             </li>
         </ul>
 
@@ -521,7 +564,11 @@
         <p>
             This allows us to test if the "hard" or "easy" training schedules create features that are stable even when the image colors look different.
         </p>
-        <img src="./images/color_time.png" width=700px/>
+
+        <figure>
+            <img src="./images/color_time.png" alt="A view of snowy mountains at sunset">
+            <figcaption>Color Robustness Visualization.</figcaption>
+        </figure>
         <h3>3.5 Low-Data Regime Implementation</h3>
         <p>
             We introduced a low-data regime to investigate whether augmentation curriculum makes a measurable difference when data is scarce. This setup is designed to simulate real-world environments where quality images or other types of data are hard to collect.
@@ -604,8 +651,15 @@
         <ul style="margin-left: 20px; line-height: 1.6em;">
             <li style="margin-bottom: 8px;"><strong>Best Performance:</strong> Colorful Cutout No Curriculum (95.64%)</li>
             <li style="margin-bottom: 8px;"><strong>Trend:</strong> The static baseline slightly outperformed both increasing and decreasing schedules.</li>
-            <img src="./images/c10_train_dots.png" width=580px/>
-            <img src="./images/c10_val_dots.png" width=580px/>
+            <figure>
+                <img src="./images/c10_train_dots.png" alt="A view of snowy mountains at sunset">
+                <figcaption>Training Accuracy for CIFAR-10 Across Epochs.</figcaption>
+            </figure>
+
+            <figure>
+                <img src="./images/c10_val_dots.png" alt="A view of snowy mountains at sunset">
+                <figcaption>Validation Accuracy for CIFAR-10 Across Epochs.</figcaption>
+            </figure>
         </ul>
         <p>
             Dynamic Contrast performed worst here, likely because the aggressive maximum box size (150 pixels) occluded too much of the 244&times;244 image, destroying necessary features.
@@ -620,8 +674,17 @@
         <ul style="margin-left: 20px; line-height: 1.6em;">
             <li style="margin-bottom: 8px;"><strong>Best Performance:</strong> Colorful Cutout No Curriculum (81.36%)</li>
             <li style="margin-bottom: 8px;"><strong>Trend:</strong> Similarly, the static baseline slightly outperformed both increasing and decreasing schedules.</li>
-            <img src="./images/c100_train_dots.png" width=580px/>
-            <img src="./images/c100_val_dots.png" width=580px/>
+
+            <figure>
+                <img src="./images/c100_train_dots.png" alt="A view of snowy mountains at sunset">
+                <figcaption>Training Accuracy for CIFAR-100 Across Epochs.</figcaption>
+            </figure>
+
+            <figure>
+                <img src="./images/c100_val_dots.png" alt="A view of snowy mountains at sunset">
+                <figcaption>Validation Accuracy for CIFAR-100 Across Epochs.</figcaption>
+            </figure>
+            
         </ul>
         <p>
             In data-rich regimes, a well-tuned static augmentation is a very strong baseline. Complex schedules often fail to provide a significant lift.
@@ -639,8 +702,12 @@
         <ul style="margin-left: 20px; line-height: 1.6em;">
             <li style="margin-bottom: 8px;"><strong>Winner:</strong> Colorful Cutout Decreasing Difficulty (91.06%)</li>
             <li style="margin-bottom: 8px;"><strong>Trend:</strong> We observed a weak pattern where Decreasing > Increasing > No Curriculum.</li>
+            
+            <figure>
+                <img src="./images/c10_full.png" alt="A view of snowy mountains at sunset">
+                <figcaption>Result: Test Accuracy for CIFAR-10 (10% Data) Compared to Full Data.</figcaption>
+            </figure>
         </ul>
-
         <p><strong>CIFAR-100 (10% Data)</strong></p>
         <p>This is our most challenging setting with more complicate task with less data.</p>
 
@@ -674,9 +741,10 @@
                 </tr>
             </tbody>
         </table>
-
-        <img src="./images/c10_full.png" width=750px/>
-        <img src="./images/c100_full.png" width=750px/>
+        <figure>
+            <img src="./images/c100_full.png" alt="A view of snowy mountains at sunset">
+            <figcaption>Result: Test Accuracy for CIFAR-100 (10% Data) Compared to Full.</figcaption>
+        </figure>
 
         <p><strong>Key Observations</strong></p>
         <ol style="margin-left: 20px; line-height: 1.6em;">
@@ -705,7 +773,11 @@
         <p>
             First, the No Curriculum (Static) baseline achieved the highest robustness overall with 38.14% accuracy. Second, among the curriculums, the Increasing (Easy &rarr; Hard) schedule consistently beat the Decreasing schedule. This was most obvious in Dynamic Cutout, where Increasing (35.07%) beat Decreasing (27.99%) by a large margin. Similar trends held for Dynamic Contrast (30.42% vs 28.12%) and Colorful Cutout (30.88% vs 30.07%).
         </p>
-        <img src="./images/shift.png" width=750px/>
+        
+        <figure>
+            <img src="./images/shift.png" alt="A view of snowy mountains at sunset">
+            <figcaption>Result: Test Accuracy for Color Robustness.</figcaption>
+        </figure>
         <p>We identify three insights based on the findings:</p>
         <ol style="margin-left: 20px; line-height: 1.6em;">
             <li style="margin-bottom: 15px;">
@@ -749,10 +821,10 @@
         <p>We plan to extend this study in four key directions:</p>
         <ul style="margin-left: 20px; line-height: 1.6em;">
             <li style="margin-bottom: 15px;">
-                <strong>Dimensions:</strong> Applying curricula to other augmentation types, such as geometric distortions, blur, or Mixup.
+                <strong>Dimensions:</strong> Applying curricula to other augmentation types, such as geometric distortions, blur, or Mixup <a href="#ref_14">[14]</a>.
             </li>
             <li style="margin-bottom: 15px;">
-                <strong>Datasets:</strong> Evaluating on benchmarks like CIFAR-C or fine-grained datasets to better assess robustness and subtle feature learning.
+                <strong>Datasets:</strong> Evaluating on benchmarks like CIFAR-C <a href="#ref_15">[15]</a> or fine-grained datasets to better assess robustness and subtle feature learning.
             </li>
             <li style="margin-bottom: 15px;">
                 <strong>Size Robustness:</strong> Investigating whether local occlusion curricula confer robustness to global scale shifts, to determine if the trade-offs observed in our color experiments hold for object size.
@@ -798,8 +870,21 @@
             <a id="ref_6"></a>[6] Maltser, R. "Augmentation Curriculum Learning." Master's Thesis, Hebrew University of Jerusalem, 2025.<br><br>
 
             <a id="ref_7"></a>[7] Choi, J., & Kim, Y. "Colorful Cutout: Enhancing Image Data Augmentation with Curriculum Learning." ICLR Tiny Papers 2024.<br><br>
+            
             <a id="ref_8"></a>[8] Krizhevsky, A., et al. "Learning multiple layers of features from tiny images." 2009.<br><br>
+
             <a id="ref_9"></a>[9] Wei, J., et al. "Few-Shot Text Classification with Triplet Networks, Data Augmentation, and Curriculum Learning." NAACL 2021.<br><br>
+
+            <a id="ref_10"></a>[10] Shorten, C., & Khoshgoftaar, T. M. "A survey on Image Data Augmentation for Deep Learning." Journal of Big Data, 2019.<br><br>
+
+            <a id="ref_11"></a>[11] Hou, Y., et al. "When to Learn What: Model-Adaptive Data Augmentation Curriculum." ICCV 2023.<br><br>
+
+            <a id="ref_12"></a>[12] Ho, D., et al. "Population Based Augmentation: Efficient Learning of Augmentation Policy Schedules." ICML 2019.<br><br>
+
+            <a id="ref_13"></a>[13] Liu, F., et al. "ACPL: Anti-Curriculum Pseudo-Labelling for Semi-Supervised Medical Image Classification." CVPR 2022.<br><br>
+            <a id="ref_14"></a>[14] Zhang, H., et al. "mixup: Beyond Empirical Risk Minimization." ICLR 2018.<br><br>
+            <a id="ref_15"></a>[15] Hendrycks, D., & Dietterich, T. "Benchmarking Neural Network Robustness to Common Corruptions and Perturbations." ICLR 2019.<br><br>
+
         </div>
     </div>
     <div class="margin-right-block"></div>
