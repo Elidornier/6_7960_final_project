@@ -195,9 +195,9 @@
         
         <div style="font-family: 'Helvetica Neue', sans-serif; font-size: 18px; color: #555;">
             <p>
-                <a href="#">Alice Xiao</a>, 
-                <a href="#">Aimee Yu</a>, 
-                <a href="#">Celinda Zhu</a>
+                <a href="#">Alice Xiao (UG)</a>, 
+                <a href="#">Aimee Yu (UG)</a>, 
+                <a href="#">Celinda Zhu (UG)</a>
             </p>
             <p style="font-size: 15px; color: #888;">
                 Final Project for 6.7960, MIT &bull; Fall 2025
@@ -283,7 +283,6 @@
         <p>
             By training ResNet50 architectures on CIFAR-10 and CIFAR-100 under these varying dynamics, we aim to decouple the impact of augmentation type from augmentation scheduling.
         </p>
-        <img src="./images/your_intro_diagram.png" width=512px/>
     </div>
     <div class="margin-right-block">
         <div style="margin-bottom: 20px;">
@@ -307,13 +306,13 @@
 
         <h3>Magnitude-Based Scheduling</h3>
         <p>
-            A key subset of Curriculum Data Augmentation focuses specifically on scheduling the <strong>intensity</strong> or <strong>magnitude</strong> of transformations. Wei et al. (2020) demonstrated that gradually increasing the magnitude of distortions (e.g., rotation angle, shear intensity) correlates with improved generalization <a href="#ref_9">[9]</a>.
+            A key subset of Curriculum Data Augmentation focuses specifically on scheduling the <strong>intensity</strong> or <strong>magnitude</strong> of transformations. Wei et al. (2021) demonstrated that gradually increasing the magnitude of distortions (e.g., rotation angle, shear intensity) correlates with improved generalization <a href="#ref_9">[9]</a>.
         </p>
         <p>
             In the context of occlusion methods, this magnitude corresponds directly to the <strong>size</strong> of the erased region. While early occlusion methods like Cutout <a href="#ref_2">[2]</a> and Random Erasing utilized fixed or randomly sampled sizes, later works such as Hide-and-Seek highlighted the delicate balance required between occlusion and feature retention. Our <strong>Dynamic Cutout Size</strong> implementation serves as a direct instantiation of magnitude-based curriculum for occlusion: we explicitly schedule the bounding box dimension ($W \times H$) as a function of the training epoch.
         </p>
 
-        <h3>The Directionality Debate</h3>
+        <h3>Directionality</h3>
         <p>
             Finally, a critical, yet under-explored question is the <strong>trajectory</strong> of augmentation difficulty. While standard CL dictates an "Easy-to-Hard" schedule, recent work by Maltser on <strong>Augmentation Curriculum Learning (ACL)</strong> investigates alternative pacing, including "Anti-Curriculum" (Hard-to-Easy) strategies <a href="#ref_6">[6]</a>. Maltser's findings suggest that explicitly scoring and ordering augmentations can outperform random selection, but the optimal direction remains a subject of debate.
         </p>
@@ -540,17 +539,191 @@
 <div class="content-margin-container" id="experiments">
     <div class="margin-left-block"></div>
     <div class="main-content-block">
+        <style>
+            /* LaTeX-style Table CSS */
+            table.academic-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-family: "Georgia", serif;
+                font-size: 15px;
+                color: #333;
+            }
+            table.academic-table th {
+                border-top: 2px solid #333;
+                border-bottom: 1px solid #333;
+                padding: 10px;
+                text-align: center;
+                font-weight: 600;
+                background-color: #fff;
+            }
+            table.academic-table td {
+                padding: 8px;
+                text-align: center;
+                border: none;
+            }
+            /* Bottom border for the last row */
+            table.academic-table tr:last-child td {
+                border-bottom: 2px solid #333;
+            }
+            /* Left-align the first column */
+            table.academic-table td:first-child, table.academic-table th:first-child {
+                text-align: left;
+                padding-left: 15px;
+            }
+            /* Alternating row colors for readability if desired, currently plain white */
+        </style>
+
         <h1>4. Experiments & Results</h1>
         <p>
-            <em>(Results pending final training runs)</em>
+            We now turn to the empirical question: given the same model, optimizer, and base recipe, how much does it matter whether augmentation difficulty increases or decreases over time? We break this analysis into three parts:
         </p>
-        
+        <ol style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 8px;"><strong>Overall Performance:</strong> Does curriculum direction affect standard test accuracy?</li>
+            <li style="margin-bottom: 8px;"><strong>Data Availability:</strong> Does the impact of curriculum change when training data is scarce?</li>
+            <li style="margin-bottom: 8px;"><strong>Color Robustness:</strong> Does a specific difficulty trajectory make the model more robust to unseen color shifts?</li>
+        </ol>
         <p>
-            We compare the test accuracy of ResNet50 on CIFAR-10 across three conditions: Static Baseline, Increasing Difficulty, and Decreasing Difficulty.
+            Throughout this section, all numbers are top-1 test accuracies. We separate full-data and low-data regimes and never compare them directly.
         </p>
+
+        <h3>4.1 Overall performance</h3>
+
+        <h3>The Full-Data Regime</h3>
+        <p>
+            When the model has access to all 50,000 training images, the specific curriculum matters less, and the no curriculum baseline (with a single random color cutout size 32&times;32) is surprisingly hard to beat.
+        </p>
+
+        <p><strong>CIFAR-10 (Full Data)</strong></p>
+        <p>
+            Performance was tightly clustered. The differences here are minute, suggesting that for easy tasks with ample data, the schedule is largely irrelevant.
+        </p>
+        <div style="text-align: center; margin: 20px 0;">
+             
+        </div>
+        <ul style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 8px;"><strong>Best Performance:</strong> Colorful Cutout No Curriculum (95.64%)</li>
+            <li style="margin-bottom: 8px;"><strong>Trend:</strong> The static baseline slightly outperformed both increasing and decreasing schedules.</li>
+            <img src="./images/c10_train_dots.png" width=580px/>
+            <img src="./images/c10_val_dots.png" width=580px/>
+        </ul>
+        <p>
+            Dynamic Contrast performed worst here, likely because the aggressive maximum box size (150 pixels) occluded too much of the 244&times;244 image, destroying necessary features.
+        </p>
+
+        <p><strong>CIFAR-100 (Full Data)</strong></p>
+        <p>
+            Similar trends appeared in the harder CIFAR-100 task.
+        </p>
+        <div style="text-align: center; margin: 20px 0;">
+        </div>
+        <ul style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 8px;"><strong>Best Performance:</strong> Colorful Cutout No Curriculum (81.36%)</li>
+            <li style="margin-bottom: 8px;"><strong>Trend:</strong> Similarly, the static baseline slightly outperformed both increasing and decreasing schedules.</li>
+            <img src="./images/c100_train_dots.png" width=580px/>
+            <img src="./images/c100_val_dots.png" width=580px/>
+        </ul>
+        <p>
+            In data-rich regimes, a well-tuned static augmentation is a very strong baseline. Complex schedules often fail to provide a significant lift.
+        </p>
+        <p>
+            At a high level: in the full-data regime, all ‘reasonable’ augmentations are clustered tightly, and the Colorful Cutout No Curriculum augmentation is already very hard to beat. Curriculums are small addons on top of an already strong recipe, and they don’t help in our current set up. In the low-data regime, curriculums can shift performance by up to 0.5–0.8% within a family, and overly aggressive dynamic schedules can hurt dramatically.
+        </p>
+
+        <h3>The Low-Data Regime (10% Data)</h3>
+        <p>
+            We want to investigate when data is scarce, whether augmentation curriculum makes a measurable difference.
+        </p>
+
+        <p><strong>CIFAR-10 (10% Data)</strong></p>
+        <ul style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 8px;"><strong>Winner:</strong> Colorful Cutout Decreasing Difficulty (91.06%)</li>
+            <li style="margin-bottom: 8px;"><strong>Trend:</strong> We observed a weak pattern where Decreasing > Increasing > Static.</li>
+        </ul>
+
+        <p><strong>CIFAR-100 (10% Data)</strong></p>
+        <p>This was our most challenging setting—hard task, scarce data.</p>
+
+        <table class="academic-table">
+            <thead>
+                <tr>
+                    <th>Augmentation Family</th>
+                    <th>Easy &rarr; Hard</th>
+                    <th>Hard &rarr; Easy</th>
+                    <th>No Curriculum</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Colorful Cutout</td>
+                    <td>64.08%</td>
+                    <td>64.72%</td>
+                    <td>63.95%</td>
+                </tr>
+                <tr>
+                    <td>Dynamic Cutout</td>
+                    <td>61.36%</td>
+                    <td>61.72%</td>
+                    <td>63.95%</td>
+                </tr>
+                <tr>
+                    <td>Dynamic Contrast</td>
+                    <td>55.98%</td>
+                    <td>57.01%</td>
+                    <td>63.95%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <img src="./images/c10_full.png" width=750px/>
+        <img src="./images/c100_full.png" width=750px/>
+
+        <p><strong>Key Observations</strong></p>
+        <ol style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 15px;">
+                <strong>Hard-to-Easy consistently beats Easy-to-Hard:</strong> The table shows that regardless of the specific augmentation method, the Decreasing schedule consistently yielded higher accuracy. We believe this "Hard-to-Easy" trajectory works better in data-scarce environments because it mitigates overfitting through two distinct phases:
+                <ul style="margin-top: 8px; list-style-type: circle;">
+                    <li style="margin-bottom: 5px;"><strong>Phase 1: Anti-Memorization.</strong> By starting with the most difficult augmentations, the model is prevented from memorizing simple pixel patterns early on. It is forced to struggle and learn only the most robust, high-level features that survive heavy occlusion.</li>
+                    <li><strong>Phase 2: Refinement.</strong> As training progresses, the difficulty is dialed back. This allows the model to "see" cleaner data and refine its decision boundaries using the robust features learned in Phase 1.</li>
+                </ul>
+                <p style="margin-top: 8px;">In contrast, the "Increasing" schedule allows the model to memorize clean images early (when the learning rate is high), only to be hit with heavy occlusion later when the learning rate is too low to effectively adapt.</p>
+            </li>
+            
+            <li style="margin-bottom: 15px;">
+                <strong>Regularization vs. Destruction:</strong> The "Dynamic Contrast" family showed significantly lower performance compared to the other groups. This is likely because the "Contrast" variant allows the occlusion box to grow up to 150 pixels. On a 32&times;32 CIFAR image, this effectively wipes out the entire input. This extreme setting highlights why the Decreasing schedule helps. An "Easy-to-Hard" schedule introduces this total destruction at the end of training, likely confusing the model just as it tries to converge. A "Hard-to-Easy" schedule treats this as extreme initial noise—forcing the model to learn from whatever scraps of pixels remain—which is then relaxed to allow fine-tuning on clearer data.
+            </li>
+
+            <li style="margin-bottom: 15px;">
+                <strong>The "Safety Net" of Colorful Cutout:</strong> Standard Colorful Cutout remained the most robust family overall, achieving the highest absolute accuracy (~64.7%). Its constraints (smaller box sizes compared to the Dynamic variants) likely prevented it from being too destructive, making it a safer default choice for low-data regimes even without a perfect curriculum.
+            </li>
+        </ol>
+
+        <h3>4.2 Color Robustness Results</h3>
+        <p>
+            We looked at the CIFAR-10 Low Data (10%) regime to compare how well different schedules handle color shifts. When there is no color shift, our previous results showed that the Decreasing (Hard &rarr; Easy) schedule was the most accurate. However, on color-shifted data, this relationship completely flipped.
+        </p>
+        <p>
+            First, the No Curriculum (Static) baseline achieved the highest robustness overall with 38.14% accuracy. Second, among the curriculums, the Increasing (Easy &rarr; Hard) schedule consistently beat the Decreasing schedule. This was most obvious in Dynamic Cutout, where Increasing (35.07%) beat Decreasing (27.99%) by a large margin. Similar trends held for Dynamic Contrast (30.42% vs 28.12%) and Colorful Cutout (30.88% vs 30.07%).
+        </p>
+        <img src="./images/shift.png" width=750px/>
+        <p>We identify three insights based on the findings:</p>
+        <ol style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 15px;">
+                We initially thought Colorful Cutout would improve color robustness because it introduces random colors during training. However, it failed to beat the baseline. This is likely because Colorful Cutout introduces "local" noise (a small pixelated box), whereas our test applies a "global" shift (like changing the lighting of the whole scene). Learning to ignore a small, noisy box does not teach the model to handle global color changes.
+            </li>
+            <li style="margin-bottom: 15px;">
+                The reversal on performance between Increasing and Decreasing schedules is likely due to how training ends. The Decreasing schedule ends with "easy," clean images. This allows the model to memorize the specific colors of the training data, boosting clean accuracy but making it brittle to changes. The Increasing schedule ends with "hard," heavily occluded images. This likely prevents the model from relying on simple color cues and forces it to learn more robust shapes, which works better when colors change.
+            </li>
+            <li>
+                The fact that the Static baseline won suggests that a consistent training environment is better for robustness. Curriculum learning helps the model specialize in the specific training task, but this specialization comes at the cost of flexibility. A static approach keeps the difficulty constant, preventing the model from over-optimizing for either the "hard" start or the "easy" finish.
+            </li>
+        </ol>
     </div>
     <div class="margin-right-block">
-        Visualizations are critical. Ensure captions explain the main takeaway of the figure.
+        <div style="margin-bottom: 20px;">
+            <strong>Takeaway:</strong><br>
+            In data-scarce regimes, the "Hard-to-Easy" trajectory consistently outperforms, likely by forcing early feature robustness.
+        </div>
     </div>
 </div>
 
@@ -558,54 +731,55 @@
     <div class="margin-left-block"></div>
     <div class="main-content-block">
         <h1>5. Discussion</h1>
-        
-        <h3>5.1 Why isn’t Easy&rarr;Hard clearly better?</h3>
         <p>
-            Theoretically, we might expect Easy&rarr;Hard to help early representation learning and then act as a regularizer, while Hard&rarr;Easy might hurt early optimization. However, our experiments suggest that once a good representation is found, the network is robust enough that the precise path through augmentation difficulty doesn’t matter—at least for ResNet-50 on CIFAR.
+            Our experiments were designed to test the intuitive belief that "Easy-to-Hard" is the optimal way to learn. The data suggests the reality is much more nuanced.
         </p>
-        <p>Possible explanations include:</p>
-        <ul>
-            <li><strong>Dataset Complexity:</strong> CIFAR is relatively small; all curricula are strong enough to regularize but not strong enough to fundamentally distort the learning dynamics.</li>
-            <li><strong>Difficulty Range:</strong> Our difficulty range may not be extreme enough to create a clear separation between "too easy" and "too hard."</li>
-            <li><strong>Optimization Noise:</strong> The optimization noise (SGD stochasticity, initialization) dominates the small second-order effect of curriculum choice.</li>
+
+        <h3>Limitations</h3>
+        <ul style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 15px;">
+                <strong>Sample Size:</strong> We used a limited number of random seeds per configuration due to computational constraints. While the trends in the low-data regime were consistent, running larger-scale trials would be necessary to verify statistical significance.
+            </li>
+            <li style="margin-bottom: 15px;">
+                <strong>Scope:</strong> We limited our study to one architecture (ResNet-50) and one family of augmentations (cutout-style). Other architectures (such as Vision Transformers) or augmentation types (such as geometric distortions or Mixup) might respond differently to curriculum learning.
+            </li>
+            <li style="margin-bottom: 15px;">
+                <strong>Epoch:</strong> Following the protocol established by Choi et al. (ICLR 2024), we restricted training to only 5 epochs. While this standardizes the computational budget, it may prevent models from reaching full convergence and doesn’t support oscillation of augmentation difficulty, potentially obscuring long-term training dynamics or effects that emerge only after extended training periods.
+            </li>
         </ul>
 
-        <h3>5.2 Interaction between Augmentation and Optimization</h3>
-        <p>
-            When augmentations are very strong (dynamic + contrast), some runs clearly underperform. This suggests a tri-way interaction between <strong>Augmentation Difficulty</strong>, <strong>Curriculum Schedule</strong>, and <strong>Optimizer Hyperparameters</strong> (LR schedule, batch size).
-        </p>
-        <p>
-            We hypothesize that with better tuning (e.g., slightly lower LR when difficulty is high, or longer warmup), a more consistent benefit of Easy&rarr;Hard might emerge. Conversely, with more extreme augmentations, curriculum might matter more: Hard&rarr;Easy early epochs with heavy corruption could cause irrecoverable damage.
-        </p>
-        <p>
-            Under conventional ResNet-50 training settings on CIFAR-10/100, the choice of augmentation curriculum direction has at most a very small effect on final test accuracy. The primary observable effect is on the distribution of outcomes (<strong>stability</strong>), not on best-case performance. Thus, for practitioners in this regime, spending effort on precise curriculum design is likely less important than robust hyperparameter tuning and choosing a reasonable base augmentation strength.
-        </p>
-
-        <h3>5.3 Limitations</h3>
-        <ul>
-            <li><strong>Sample Size:</strong> We used a small number of seeds per configuration due to computational constraints.</li>
-            <li><strong>Scope:</strong> We limited our study to one architecture (ResNet-50) and one family of augmentations (cutout-style).</li>
-            <li><strong>Hyperparameters:</strong> We did not tune hyperparameters per curriculum; they all shared the same optimizer and LR schedule.</li>
-            <li><strong>Metric:</strong> We analyzed final test accuracy only, without analyzing full training curves or early-epoch behavior.</li>
+        <h3>Future Work</h3>
+        <p>We plan to extend this study in four key directions:</p>
+        <ul style="margin-left: 20px; line-height: 1.6em;">
+            <li style="margin-bottom: 15px;">
+                <strong>Dimensions:</strong> Applying curricula to other augmentation types, such as geometric distortions, blur, or Mixup.
+            </li>
+            <li style="margin-bottom: 15px;">
+                <strong>Datasets:</strong> Evaluating on benchmarks like CIFAR-C or fine-grained datasets to better assess robustness and subtle feature learning.
+            </li>
+            <li style="margin-bottom: 15px;">
+                <strong>Size Robustness:</strong> Investigating whether local occlusion curricula confer robustness to global scale shifts, to determine if the trade-offs observed in our color experiments hold for object size.
+            </li>
+            <li style="margin-bottom: 15px;">
+                <strong>Adaptive Curriculum:</strong> Investigating schedules where difficulty adjusts dynamically based on model performance rather than a fixed timeline.
+            </li>
         </ul>
 
-        <h3>5.4 Future Work</h3>
-        <ul>
-            <li><strong>Adaptive Curriculum:</strong> Explore curricula where difficulty is adjusted based on training loss or validation accuracy rather than a fixed linear schedule.</li>
-            <li><strong>Dimensions:</strong> Explore other augmentation dimensions: color jitter strength, blur, geometric distortions, or RandAugment magnitude schedules.</li>
-            <li><strong>Datasets:</strong> Consider more challenging datasets or architectures, where overfitting and representation learning challenges are more severe.</li>
-        </ul>
-
-        <h3>5.5 Conclusion</h3>
+        <h3>Conclusion</h3>
         <p>
-            We evaluated several curricula (increasing, decreasing, static augmentation difficulty) across different cutout-style augmentations on CIFAR-10 and CIFAR-100 with ResNet-50.
+            Our experiments were designed to test the intuitive belief that "Easy-to-Hard" is the optimal way to learn, but the data suggests a more nuanced reality.
         </p>
         <p>
-            Contrary to the intuitive expectation, no curriculum direction consistently outperformed the others in terms of best-case test accuracy. The main effect of strong augmentation and curricula in this regime is on <strong>training stability</strong>, not on the quality of the final solution. This suggests that, at least in this standard vision benchmark setting, augmentation curricula are a relatively second-order design choice compared to base augmentation strength.
+            Overall, the static "No Curriculum" baseline generally worked best. In full-data regimes, all methods show similar accuracy; this is likely because ResNet-50 already achieves high performance on CIFAR regardless of the schedule. However, in the low-data regime, the "Hard-to-Easy" schedule consistently beat "Easy-to-Hard." We attribute this to an anti-memorization effect: heavy early augmentation prevents overfitting, while easing off later allows for refinement.
+        </p>
+        <p>
+            In contrast, Color Robustness tests showed the exact opposite trend: "Easy-to-Hard" outperformed "Hard-to-Easy." This suggests that finishing with "easy" data boosts clean accuracy but causes the model to overfit to specific training colors, reducing robustness. We also found that Colorful Cutout did not improve color robustness as assumed, likely because local noise does not teach global color invariance.
+        </p>
+        <p>
+            Ultimately, while "Hard-to-Easy" is powerful for data-scarce environments, and "Easy-to-Hard" favors robustness, a consistent static baseline often provides the best overall balance of stability and generalizability.
         </p>
     </div>
-    <div class="margin-right-block">
-    </div>
+    <div class="margin-right-block"></div>
 </div>
 
 <div class="content-margin-container" id="citations">
@@ -627,11 +801,8 @@
             <a id="ref_6"></a>[6] Maltser, R. "Augmentation Curriculum Learning." Master's Thesis, Hebrew University of Jerusalem, 2025.<br><br>
 
             <a id="ref_7"></a>[7] Choi, J., & Kim, Y. "Colorful Cutout: Enhancing Image Data Augmentation with Curriculum Learning." ICLR Tiny Papers 2024.<br><br>
-            
             <a id="ref_8"></a>[8] Krizhevsky, A., et al. "Learning multiple layers of features from tiny images." 2009.<br><br>
-
             <a id="ref_9"></a>[9] Wei, J., et al. "Few-Shot Text Classification with Triplet Networks, Data Augmentation, and Curriculum Learning." NAACL 2021.<br><br>
-
         </div>
     </div>
     <div class="margin-right-block"></div>
